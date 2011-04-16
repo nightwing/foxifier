@@ -1,5 +1,5 @@
 var xml =
-	<panel id='load-control-panel' type="arrow" orient='vertical' onclick='CombinedStopReload.panelClick(event)'>
+	<panel id='load-control-panel' type="arrow" orient='vertical' onclick='CombinedStopReload.panelClick(event)' context='toolbar-context-menu'>
 		<hbox>
 			<groupbox>
 				<caption><button action="s-this"  label='stop'/></caption>
@@ -71,17 +71,19 @@ function modifyCombinedStopReload(window){with(window){
 		}
 	}
 	CombinedStopReload.panelClick = function(event){
+		if(event.button==2)
+			return
 		switch(event.target.getAttribute('action')){
 			case "s-all": 
 				iterateBrowsers(function(i){
-					i.webNavigation.stop(nsIWebNavigation.STOP_ALL);
-				});
+					i.webNavigation.stop(nsIWebNavigation.STOP_ALL);return true;
+				}, 'stop');
 				break
 			case "s-other": 
 				var cb=gBrowser.mCurrentBrowser
 				iterateBrowsers(function(i){
 					if(i!=cb)i.webNavigation.stop(nsIWebNavigation.STOP_ALL);
-				});
+				}, 'stop');
 				break
 			case "f-this":
 				gBrowser.mCurrentBrowser.webNavigation.allowJavascript = false
@@ -91,23 +93,24 @@ function modifyCombinedStopReload(window){with(window){
 			case "r-this":  BrowserReload();break			
 			case "r-all": 
 				iterateBrowsers(function(i){
-					i.reload();
-				});
+					i.reload();return true
+				}, 'reload');
 				break
 			case "r-other":
+				var cb=gBrowser.mCurrentBrowser
 				iterateBrowsers(function(i){
-					if(i!=cb)i.reload();
-				});
+					if(i!=cb){i.reload();return true}
+				}, 'reload');
 				break
 			case "r-broken": 
 				iterateBrowsers(function(i){
-					if(/about:neterror/.test(i.contentDocument.baseURI))i.reload()
-				});
+					if(/about:neterror/.test(i.contentDocument.baseURI)){i.reload();return true}
+				}, 'reload');
 				break
 			case "r-stopped": 
 				iterateBrowsers(function(i){
-					if(i.contentDocument.readyState=='loading')i.reload()
-				});
+					if(i.contentDocument.readyState=='loading'){i.reload();return true}
+				}, 'reload');
 				break			
 			case "disableJS": 
 				var webnav=gBrowser.mCurrentBrowser.webNavigation
@@ -117,16 +120,35 @@ function modifyCombinedStopReload(window){with(window){
 		}
 	}
 	
-	function iterateBrowsers(action){
+	function iterateBrowsers(action, actionName){
 		var brs=gBrowser.browsers
 		var tbs=gBrowser.tabs
+		var count=0
 		for(var i in brs){
 			var br=brs[i],tb=tbs[i]
-			if(!tb.hidden)
-				action(br)
+			if(!tb.hidden){
+				action(br)&&count++
+			}
 		}
+		sayCount(count, actionName)
 	}	
-	
+	function sayCount(count, actionName){
+		//document.getElementById("load-control-panel").setAttribute('noautohide',true)
+		var panel = document.getElementById("load-control-panel") 
+		var lab = panel.getElementsByTagName('label')[0] || panel.appendChild(
+			document.createElement('label')
+		)
+		lab.style.MozTransition='opacity 500ms ease-out 0ms'
+		lab.style.opacity=1
+		setTimeout(function(){
+			lab.style.MozTransition='opacity 700ms ease-out 0ms'
+			lab.style.opacity=0
+		},1000)
+
+		lab.value=count+' tabs '+ actionName +'ed'
+
+		lab.style.cssText="height:0px;padding:0px;text-align:center;pointer-events:none;-moz-transform:translatey(-2px);"
+	}	
 	
 	/**************/
 	//CombinedStopReload._init = CombinedStopReload.init
