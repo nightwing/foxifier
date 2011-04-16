@@ -4,6 +4,13 @@ __SCRIPT_URI_SPEC__=XPIProviderBP.XPIProvider.bootstrapScopes["absolute@load.con
 	var panel=window.document.getElementById('load-control-panel')
 	if(panel)
 		panel.parentNode.removeChild(panel)
+		
+	var button = CombinedStopReload.stop
+	button.setAttribute('command', 'Browser:Stop');
+	button.removeAttribute('onclick')
+	button.removeAttribute('context')
+	button.disabled=false
+	
 	
 	var button = CombinedStopReload.reload
 	button.setAttribute('command', "Browser:ReloadOrDuplicate");
@@ -15,13 +22,6 @@ __SCRIPT_URI_SPEC__=XPIProviderBP.XPIProvider.bootstrapScopes["absolute@load.con
 	button.removeAttribute('context')
 	button.disabled=false
 
-	
-	var button = CombinedStopReload.stop
-	button.setAttribute('command', 'Browser:Stop');
-	button.removeAttribute('onclick')
-	button.removeAttribute('context')
-	button.disabled=false
-	
 	window.XULBrowserWindow.stopCommand.setAttribute("disabled", !button.hasAttribute("displaystop") );
 
 })()

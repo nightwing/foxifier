@@ -44,6 +44,7 @@ function modifyCombinedStopReload(window){with(window){
 	CombinedStopReload.switchToReload = function(){
 		this.reload.removeAttribute("displaystop");
 	}
+	
 	CombinedStopReload.buttonClick = function(event){
 		var reloadFlags, button=event.button
 		if(button==2){
@@ -55,7 +56,7 @@ function modifyCombinedStopReload(window){with(window){
 		}else if(XULBrowserWindow.isBusy){
 			BrowserStop()
 		}else{
-			if(event.ctrlKey&& button==0)
+			if(event.ctrlKey && button==0)
 				reloadFlags =  nsIWebNavigation.LOAD_FLAGS_BYPASS_PROXY | nsIWebNavigation.LOAD_FLAGS_BYPASS_CACHE;
 			else if(event.shiftKey&&button==0 || button==1)
 				reloadFlags = nsIWebNavigation.LOAD_FLAGS_CHARSET_CHANGE
@@ -97,7 +98,7 @@ function modifyCombinedStopReload(window){with(window){
 				iterateBrowsers(function(i){
 					if(i!=cb)i.reload();
 				});
-				break				
+				break
 			case "r-broken": 
 				iterateBrowsers(function(i){
 					if(/about:neterror/.test(i.contentDocument.baseURI))i.reload()
@@ -148,19 +149,22 @@ function modifyCombinedStopReload(window){with(window){
 				stop = document.getElementById("urlbar-stop-button");
 			}
 		}
-		if (!stop || !reload || reload.nextSibling != stop)
-			return;
+		if (!stop || !reload || reload.nextSibling != stop){
+			this.reload = reload;
+			this.stop = stop;
+			this['someUsersWantUncombinedButtonsToGive5Stars:(']()
+		}else{
+			this.reload = reload;
+			this.stop = stop;
+			if (XULBrowserWindow.stopCommand.getAttribute("disabled") != "true")
+				reload.setAttribute("displaystop", "true");
+			this.loadControlHook()
+		}
+
 		this._initialized = true;
-		if (XULBrowserWindow.stopCommand.getAttribute("disabled") != "true")
-			reload.setAttribute("displaystop", "true");
-		this.reload = reload;
-		this.stop = stop;
-		this.loadControlHook()
+		appendXML(window.document)
 	}
 	CombinedStopReload.loadControlHook = function(){
-		appendXML(window.document)
-		this.stop.removeEventListener("click", this, false);
-		this._cancelTransition()
 		/*****/
 		var button = this.reload
 		button.removeAttribute('command');
@@ -172,7 +176,7 @@ function modifyCombinedStopReload(window){with(window){
 		button.setAttribute('context','load-control-panel')
 		button.disabled=false
 
-		var button = this.stop
+		var button = this.stop 
 		button.removeAttribute('command');
 		button.removeAttribute('oncommand')
 		button.setAttribute('onclick','CombinedStopReload.buttonClick(event)')
@@ -181,19 +185,62 @@ function modifyCombinedStopReload(window){with(window){
 		button.disabled=false
 		/*****/
 		window.XULBrowserWindow.stopCommand.removeAttribute("disabled");
+		/*****/
+		if(!this.switchToReload){
+			this.switchToStop = this._switchToStop 
+			this.switchToReload = this._switchToReload
+			delete this._switchToStop
+			delete this._switchToReload
+		}
 	}
 	CombinedStopReload.uninit = function () {
 		if (!this._initialized)
 		  return;
 		this._initialized = false;
+		var panel=window.document.getElementById('load-control-panel')
+		panel && panel.parentNode.removeChild(panel)
+	}
+	//
+	CombinedStopReload['someUsersWantUncombinedButtonsToGive5Stars:('] = function(){
+		var fakeRClick = 'CombinedStopReload.buttonClick({button:2,target:this})'
+		var button = this.stop || {__noSuchMethod__:dump}
+		button.setAttribute('command', 'Browser:Stop');
+		button.removeAttribute('onclick')
+		button.setAttribute('context','load-control-panel')
+		button.setAttribute('oncontextmenu', fakeRClick)
+		button.disabled=false
+
+		var button = this.reload || {__noSuchMethod__:dump}
+		button.setAttribute('command', "Browser:ReloadOrDuplicate");
+		button.setAttribute('onclick','checkForMiddleClick(this, event);')
+		if(	button.hasAttribute('oldtooltiptext')){
+			button.setAttribute('tooltiptext', button.getAttribute('oldtooltiptext'))
+			button.removeAttribute('oldtooltiptext')
+		}
+		button.setAttribute('context','load-control-panel')
+		button.setAttribute('oncontextmenu', fakeRClick)
+		button.disabled=false
+
+
+		//XULBrowserWindow.stopCommand.setAttribute("disabled", !button.hasAttribute("displaystop") );
+		this.reload.removeAttribute("displaystop");
+		CombinedStopReload.__noSuchMethod__ = function(){}
+		if(this.switchToReload){
+			this._switchToStop = this.switchToStop 
+			this._switchToReload = this.switchToReload
+			delete this.switchToStop
+			delete this.switchToReload
+		}
 	}
 }}
 
 function loadIntoWindow(window) {
-	try{		
+	try{
+		var csr = window.CombinedStopReload
+		if(csr._initialized)
+			csr.uninit()
 		modifyCombinedStopReload(window)
-		if(window.CombinedStopReload._initialized)
-			window.CombinedStopReload.loadControlHook()
+		csr.init()
 	}catch(e){Components.utils.reportError(e)}
 }
 
