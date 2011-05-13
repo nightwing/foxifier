@@ -1,0 +1,19 @@
+/************************************************************************************************/
+/* splitmenu */
+menuitem.split-menuitem-item[_moz-menuactive="true"], .split-menu-right-image[_moz-menuactive="true"] {
+    background-color: -moz-menuhover;
+    color: -moz-menuhovertext;
+}
+
+.split-menu-right-image {
+    -moz-appearance: menuitem;
+    -moz-box-pack: end;
+}
+
+menu[type=splitmenu] {
+    -moz-binding: url("bindings.xml#splitmenu");
+    -moz-box-orient: horizontal;
+    -moz-appearance: none !important;
+    color: menutext;
+    background-color: transparent !important;
+}
