@@ -11,7 +11,7 @@ menuitem.split-menuitem-item[_moz-menuactive="true"], .split-menu-right-image[_m
 }
 
 menu[type=splitmenu] {
-    -moz-binding: url("bindings.xml#splitmenu");
+    -moz-binding: url("chrome://foxifier/content/bindings.xml#splitmenu");
     -moz-box-orient: horizontal;
     -moz-appearance: none !important;
     color: menutext;
