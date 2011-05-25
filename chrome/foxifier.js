@@ -291,14 +291,14 @@ BrowserHandleBackspace = BrowserHandleShiftBackspace = dump
  *   onRefreshAttempted
  */
 TabsProgressListener.onRefreshAttempted=function(aBrowser, aWebProgress, aURI, aDelay, aSameURI){
-	dump(aBrowser, aWebProgress, aURI, aDelay, aSameURI)
-	PopupNotifications.show(
+	//dump(aBrowser, aWebProgress, aURI, aDelay, aSameURI)
+	/*PopupNotifications.show(
 		gBrowser.mCurrentBrowser, 'notificationID', aSameURI?'reload'+aDelay:'redirect '+aURI.spec+aDelay, 'ff-LogoBtn',
 		{label:'pop',accessKey:'s',
 		 callback:function(){}
 		},
 		null, {timeout:30000}
-	);
+	);*/
 
 	return !aSameURI
 
