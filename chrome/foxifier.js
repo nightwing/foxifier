@@ -317,3 +317,137 @@ window.addEventListener("load", function(){
 	gFindBar._shouldFastFind=function(){}
 }, false);
 
+
+
+/***************************************************************************
+ *   swapCookies
+ */
+// helpers
+// helpers
+function writeToFile(file, text) {
+    var fostream = Cc['@mozilla.org/network/file-output-stream;1'].createInstance(Ci.nsIFileOutputStream), converter = Cc['@mozilla.org/intl/converter-output-stream;1'].createInstance(Ci.nsIConverterOutputStream);
+    fostream.init(file, 2 | 8 | 32, 436, 0);
+    converter.init(fostream, "UTF-8", 4096, 0);
+    converter.writeString(text);
+    converter.close();
+}
+function getInProfileFilePath(name, getFile){
+	var dir = Services.dirsvc.get("ProfD", Ci.nsIFile);
+	dir.append(name)
+	if(getFile)
+		return dir
+	var fileHandler = Services.io.getProtocolHandler("file").QueryInterface(Ci.nsIFileProtocolHandler);
+	var uri = fileHandler.getURLSpecFromFile(dir);
+		
+	return uri
+}
+// todo: use async request
+function makeReq(href) {
+    var req = new XMLHttpRequest;
+    req.overrideMimeType("text/plain");
+    req.open("GET", href, false);
+    try {
+        req.send(null);
+    } catch (e) {
+    }
+    return req.responseText;
+}
+
+var cookieSwap = {
+	getCookies: function(host){
+		var ans = [];
+		var e = Services.cookies.getCookiesFromHost(host)
+		while(e.hasMoreElements()){
+			item=e.getNext(Ci.nsICookie).QueryInterface(Ci.nsICookie).QueryInterface(Ci.nsICookie2)
+			var cookieData = [
+				item.host, item.path, item.name,
+				item.value,
+				item.isSecure, item.isHttpOnly, item.isSession,
+				item.expiry]
+			ans.push(cookieData)		
+		}
+		return ans
+	},
+	removeCookie: function(cookieData){
+		//Services.cookies.remove(item.host, item.name, item.path, false)
+		Services.cookies.remove(cookieData[0], cookieData[2], cookieData[1], false)
+	},
+	addCookie: function (cookieData){
+		//Services.cookies.remove(item.host, item.name, item.path, false)
+		Services.cookies.add.apply(Services.cookies, cookieData)
+	},
+	
+	saveProfileData: function(){
+		writeToFile(
+			getInProfileFilePath('cookieSwap.txt', true),
+			JSON.stringify(this.profiles)
+		)
+	},
+	get profiles () {
+		try{
+			var path = getInProfileFilePath('cookieSwap.txt')
+			var text = makeReq(path)
+			delete this.profiles
+			var profiles = JSON.parse(text)
+		}catch(e){Cu.reportError(e)}
+		
+		return this.profiles = profiles || {__currentProfile__: 'default'}
+	},
+
+	captureProfile: function(name){		
+		return this.profiles[name] = this.getCookies('google.com')
+	},
+	removeProfile: function(name){
+		if(this.profiles[name])
+			for each(var i in this.profiles[name])
+				this.removeCookie(i)
+	},
+	setProfile: function(name){
+		if(this.profiles[name])
+			for each(var i in this.profiles[name])
+				this.addCookie(i)
+	},
+
+	switchToProfile: function(name){
+		var currentName = this.profiles.__currentProfile__
+		this.captureProfile(currentName)
+		this.removeProfile(currentName)
+		if(name=='__currentProfile__' || name=='empty'){
+			name = 'undefined'
+		}else
+			this.setProfile(name)
+		this.profiles.__currentProfile__ = name
+		setTimeout(this.saveProfileData.bind(this),10000)
+	},
+	
+	switchAndReload: function(name, loadMail){
+		var brs=gBrowser.browsers
+		var tbs=gBrowser.tabs
+		var currentBr=gBrowser.mCurrentBrowser
+		for(var i in brs){
+			var br=brs[i],tab=tbs[i], loc = br._contentWindow.location.href
+			if(br!=currentBr && loc.search('mail.google.com')!=-1){
+				//tab=gBrowser.mCurrentTab
+				//Cc['@mozilla.org/browser/sessionstore;1'].getService(Ci.nsISessionStore).duplicateTab(window,tab , 0)
+				gBrowser.removeTab(tab, {animate: false, byMouse: false})
+			}
+		}
+		this.switchToProfile(name)
+		// loc = currentBr._contentWindow.location.href
+		if(loadMail)
+			getWebNavigation().loadURI('https://mail.google.com/mail/', 	
+									nsIWebNavigation.LOAD_FLAGS_BYPASS_HISTORY |
+									nsIWebNavigation.LOAD_FLAGS_CHARSET_CHANGE |
+									nsIWebNavigation.LOAD_FLAGS_REPLACE_HISTORY,
+								  null, null, null);
+		else
+			currentBr.reloadWithFlags(nsIWebNavigation.LOAD_FLAGS_CHARSET_CHANGE)
+	},
+	onPopupCommand: function(e){
+		var t = e.target
+		var name = t.getAttribute('value')
+		if(name)
+			this.switchAndReload(name, !e.button)
+	}
+	
+}

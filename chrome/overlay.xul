@@ -81,4 +81,46 @@ gBrowser.moveTabTo(tab,tab._tPos+1)
 		<progressmeter id="urlbar-progress-alt"  mode="normal" value="0" collapsed="true" />
 	</textbox>
 	
+	
+	 <!-- cookieSwap -->
+	<statusbar id="status-bar" class="chromeclass-status">
+      <statusbarpanel id="cookieSwap-panel" 
+         tooltip="cookieswap-tooltip"
+		 popup="cookie-element-list"
+		 context="cookie-element-list"
+         ondblclick="" >
+         <hbox align='center'>
+             <image id="cookieswap-status-bar-icon" src="http://g.etfv.co/https://mail.google.com/mail" /> 
+             <!-- <label value="mail" /> -->
+         </hbox>
+      </statusbarpanel>
+   </statusbar>
+
+   <popupset id="mainPopupSet">
+      <menupopup id="cookie-element-list" oncommand="cookieSwap.onPopupCommand(event)"
+			 onpopupshown="var p = this.getElementsByAttribute('value', cookieSwap.profiles.__currentProfile__)[0]||
+				this.getElementsByAttribute('value', 'empty')[0];
+				p.setAttribute('checked', true)">
+         <menuitem value="1" label="1" type='radio'/>
+         <menuitem value="2" label="2" type='radio'/>
+         <menuitem value="3" label="3" type='radio'/>
+         <menuitem value="4" label="4" type='radio'/>
+         <menuitem value="5" label="5" type='radio'/>
+         <menuitem value="empty" label="empty" type='radio'/>
+
+         <menuseparator id="cookie-profile-list-separator" />
+         <menuitem id="cookieswap-menu-help" label="Help"    
+                   oncommand="gBrowser.selectedTab = gBrowser.addTab('http://cookieswap.mozdev.org/help.html')" />
+      </menupopup>
+      
+      <tooltip id="cookieswap-tooltip" insertafter="backMenu">
+         <vbox flex="1">
+             <label id="cookieswap-tooltip0" value="CookieSwap:"/>
+             <label id="cookieswap-tooltip2" value="right click select a new profile and reload"/>
+             <label id="cookieswap-tooltip1" value="Click select a new profile and load mail"/>
+         </vbox>
+      </tooltip>
+   </popupset>
+   
+	
 </overlay>
