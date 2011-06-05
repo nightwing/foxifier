@@ -451,3 +451,6 @@ var cookieSwap = {
 	}
 	
 }
+// Services.cookies is missing on ff4 
+if(!Services.cookies)
+	Services.cookies=Cc["@mozilla.org/cookiemanager;1"].getService(Ci.nsICookieManager2)
