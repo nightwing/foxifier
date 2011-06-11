@@ -73,7 +73,7 @@ function PHMM_populateUndoSubmenu(popup) {
         m.setAttribute("class", "menuitem-iconic bookmark-item menuitem-with-favicon");
         m.setAttribute("value", i);
         m.setAttribute("oncommand", "undoCloseTab(" + i + ");");
-        m.setAttribute("closemenu", "none");
+        //m.setAttribute("closemenu", "none");
         let tabData = undoItems[i].state;
         let activeIndex = (tabData.index || tabData.entries.length) - 1;
         if (activeIndex >= 0 && tabData.entries[activeIndex]) {
@@ -442,6 +442,7 @@ var cookieSwap = {
 								  null, null, null);
 		else
 			currentBr.reloadWithFlags(nsIWebNavigation.LOAD_FLAGS_CHARSET_CHANGE)
+		gBrowser._lastRelatedTab = null
 	},
 	onPopupCommand: function(e){
 		var t = e.target

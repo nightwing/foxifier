@@ -8,17 +8,21 @@
 				oncommand="
 		var tab=gBrowser.mContextTab||gBrowser.mCurrentTab;
 		var newTab = Cc['@mozilla.org/browser/sessionstore;1'].getService(Ci.nsISessionStore).duplicateTab(window, tab, 0);
-gBrowser.moveTabTo(tab,tab._tPos+1)
-		"
+			gBrowser.moveTabTo(newTab,tab._tPos)"
 	  />
 	  <menuitem id="context_undoCloseTab" 
 	            
 				removeelement="true"/>
 	  <menu id="context_undoCloseTab" type='splitmenu' label="Undo Close Tab"  closemenu="none"
 			accesskey="U" observes="History:UndoCloseTab" oncommand="if(event.target==this)undoCloseTab();" position="1">
-			<menupopup 	onpopupshowing="PHMM_populateUndoSubmenu.call(document.getElementById('history-menu')._placesView,this)"
-/>
+			<menupopup 	onpopupshowing="PHMM_populateUndoSubmenu.call(document.getElementById('history-menu')._placesView,this)"/>
 	  </menu>
+	  <menuitem id="context_duplicate" insertbefore="context_reloadTab" label="Duplicate" accesskey="D" 
+				oncommand="
+		var tab=gBrowser.mContextTab||gBrowser.mCurrentTab;
+		var newTab = Cc['@mozilla.org/browser/sessionstore;1'].getService(Ci.nsISessionStore).duplicateTab(window, tab, 0);
+			gBrowser.moveTabTo(newTab,tab._tPos);gBrowser.removeTab(tab, {animate: false, byMouse: false})"
+	  />
 	</menupopup>
 	
 	
