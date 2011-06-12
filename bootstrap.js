@@ -127,7 +127,7 @@ function modifyCombinedStopReload(window){with(window){
 		for(var i in brs){
 			var br=brs[i],tb=tbs[i]
 			if(!tb.hidden){
-				action(br)&&count++
+				action(br)&&(count++)
 			}
 		}
 		sayCount(count, actionName)
