@@ -16,6 +16,7 @@
 	  <menu id="context_undoCloseTab" type='splitmenu' label="Undo Close Tab"  closemenu="none"
 			accesskey="U" observes="History:UndoCloseTab" oncommand="if(event.target==this)undoCloseTab();" position="1">
 			<menupopup 	onpopupshowing="PHMM_populateUndoSubmenu.call(document.getElementById('history-menu')._placesView,this)"/>
+			<menupopup 	onpopupshowing="PHMM_populateUndoSubmenu.call(document.getElementById('history-menu')._placesView,this)"/>
 	  </menu>
 	  <menuitem id="context_duplicate" insertbefore="context_reloadTab" label="Duplicate" accesskey="D" 
 				oncommand="
@@ -38,8 +39,12 @@
 
       <menuitem id="context-openlinkintab" removeelement="true"/>
 	  <menu id="context-openlinkintab" type='splitmenu' label="Open Link in New Tab" 
-			onclick="gContextMenu.openLinkIn(event);" insertbefore='context-sep-open'>
-			<menupopup><menuitem label="in new window" where='window'/></menupopup>
+				onclick="gContextMenu.openLinkIn(event);" insertbefore='context-sep-open'>
+			<menupopup>
+				<menuitem label="here" where='current'/>			
+				<menuitem label="foreground" where='tabshifted'/>			
+				<menuitem label="in new window" where='window'/>
+			</menupopup>
 	  </menu>
 	  <menu id="context-search" type='splitmenu' label=""  iconic="true" 
 			onclick='gContextMenu.doSearch(event)' insertbefore='context-sep-open'>

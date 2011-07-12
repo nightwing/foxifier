@@ -46,7 +46,7 @@ toOpenWindowByURI=function(uri){
 
 }
 
-
+// undo close tab
 function PHMM_populateUndoSubmenu(popup) {
 	window._ss = window._ss||Cc["@mozilla.org/browser/sessionstore;1"].getService(Ci.nsISessionStore)
     var undoMenu = popup.parentNode;
@@ -96,16 +96,15 @@ function PHMM_populateUndoSubmenu(popup) {
 /*********************************************************************************
  ** contextMenu **
  */
-nsContextMenu.prototype.openLinkIn = function(e){
-	dump(e.originalTarget.localName,e.originalTarget.getAttribute('where'))
-	if(e.originalTarget.localName!='menuitem')
+nsContextMenu.prototype.openLinkIn = function(e) {
+	if(e.originalTarget.localName != 'menuitem')
 		return
 	var where = e.originalTarget.getAttribute('where')
 	if(!where)
 		where = e.button!=0 ? "current":"tab";
     var doc = this.target.ownerDocument;
     openLinkIn(this.linkURL, where, { charset: doc.characterSet,
-                 referrerURI: doc.documentURIObject });
+        referrerURI: doc.documentURIObject });
 }
 nsContextMenu.prototype.getSelectedText = function() {
 	var selectedText = getBrowserSelection();
@@ -136,8 +135,9 @@ nsContextMenu.prototype.isTextSelection = function() {
 		return false;
 	}
 	
+	var croppedText = selectedText
     if (selectedText.length > 15)
-      selectedText = selectedText.substr(0,15) + this.ellipsis;
+      croppedText = selectedText.substr(0,15) + this.ellipsis;
 
     // Use the current engine if the search bar is visible, the default
     // engine otherwise.
@@ -145,8 +145,8 @@ nsContextMenu.prototype.isTextSelection = function() {
 												"currentEngine": "defaultEngine"];
   
     // format "Search <engine> for <selection>" string to show in menu
-    var menuLabel = gNavigatorBundle.getFormattedString("contextMenuSearchText",
-                                                        [engine.name, selectedText]);
+    var menuLabel = gNavigatorBundle.getFormattedString("contextMenuSearchText", [engine.name, croppedText]);
+	
 	if(menu){
 		menu.label = menuLabel;
 		menu.image = engine.iconURI.spec
@@ -154,10 +154,10 @@ nsContextMenu.prototype.isTextSelection = function() {
 		menu.accessKey = gNavigatorBundle.getString("contextMenuSearchText.accesskey"); 
 		menu.hidden = false
 	}
-
-    return true;
+	// this makes isSelectedText be cache the selected text
+    return selectedText;
 }
-nsContextMenu.prototype.fillSearchSubmenu=function(popup){
+nsContextMenu.prototype.fillSearchSubmenu = function(popup) {
 	var menu
 	while(menu = popup.firstChild)
 		popup.removeChild(menu)
@@ -170,7 +170,7 @@ nsContextMenu.prototype.fillSearchSubmenu=function(popup){
 		popup.appendChild(menu)
 	})
 }
-nsContextMenu.prototype.doSearch=function(e){
+nsContextMenu.prototype.doSearch = function(e) {
 	var name = e.originalTarget.getAttribute('name')
 	if(!name)
 		return
@@ -218,6 +218,49 @@ nsContextMenu.prototype.initViewItems = function() {
             .disabled = !this.hasBGImage;
 
     this.showItem("context-viewimageinfo", this.onImage);
+}
+
+nsContextMenu.prototype.initOpenItems = function() {
+    var isMailtoInternal = false;
+    if (this.onMailtoLink) {
+        var mailtoHandler = Cc["@mozilla.org/uriloader/external-protocol-service;1"].
+			getService(Ci.nsIExternalProtocolService).getProtocolHandlerInfo("mailto");
+        isMailtoInternal = (!mailtoHandler.alwaysAskBeforeHandling && mailtoHandler.preferredAction == Ci.nsIHandlerInfo.useHelperApp && (mailtoHandler.preferredApplicationHandler instanceof Ci.nsIWebHandlerApp));
+    }
+
+    // Time to do some bad things and see if we've highlighted a URL that
+    // isn't actually linked.
+    var onPlainTextLink = false;
+    if (!this.onLink) {
+        let uri;
+        let linkText = this.isTextSelected;
+		if (linkText) {
+			if (/^(?:https?|ftp):/i.test(linkText)) {
+				try {
+					uri = makeURI(linkText);
+				} catch (ex) {}
+			}
+			// Check if this could be a valid url, just missing the protocol.
+			else if (/^(?:[a-z\d-]+\.)+[a-z]+$/i.test(linkText)) {
+				let uriFixup = Cc["@mozilla.org/docshell/urifixup;1"].getService(Ci.nsIURIFixup);
+				try {
+					uri = uriFixup.createFixupURI(linkText, uriFixup.FIXUP_FLAG_NONE);
+				} catch (ex) {}		
+			}
+
+			if (uri && uri.host) {
+				this.linkURI = uri;
+				this.linkURL = this.linkURI.spec;
+				onPlainTextLink = true;
+			}
+		} else {
+			abs = [document.popupNode, document.popupRangeParent,
+                   document.popupRangeOffset]
+		}
+    }
+
+    var shouldShow = this.onSaveableLink || isMailtoInternal || onPlainTextLink;
+    this.showItem("context-openlinkintab", shouldShow);
 }
 
 
