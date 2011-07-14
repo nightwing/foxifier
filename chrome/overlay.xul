@@ -39,6 +39,8 @@
 
       <menuitem id="context-openlinkintab" removeelement="true"/>
 	  <menu id="context-openlinkintab" type='splitmenu' label="Open Link in New Tab" 
+				onmouseover="window.XULBrowserWindow.setOverLink(this.linkText, null);"
+				onmouseout="window.XULBrowserWindow.setOverLink('', null);"
 				onclick="gContextMenu.openLinkIn(event);" insertbefore='context-sep-open'>
 			<menupopup>
 				<menuitem label="here" where='current'/>			

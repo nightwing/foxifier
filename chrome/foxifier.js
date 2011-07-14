@@ -221,6 +221,10 @@ nsContextMenu.prototype.initViewItems = function() {
 }
 
 nsContextMenu.prototype.initOpenItems = function() {
+    var item = document.getElementById("context-openlinkintab")
+	if(!item)
+		return;
+
     var isMailtoInternal = false;
     if (this.onMailtoLink) {
         var mailtoHandler = Cc["@mozilla.org/uriloader/external-protocol-service;1"].
@@ -234,6 +238,24 @@ nsContextMenu.prototype.initOpenItems = function() {
     if (!this.onLink) {
         let uri;
         let linkText = this.isTextSelected;
+
+		if (!linkText) {
+			var r = /https?:\/\/[\w\.\/\-\d]+/
+
+			var text = document.popupRangeParent.textContent
+			var l = document.popupRangeOffset
+			var match
+			while(match = text.match(r)){
+				var end = match.index+match[0].length
+				if (match.index > l)
+					break
+
+				if (end > l)
+					linkText = match[0]
+				text = text.substr(end )
+			}	
+		}
+
 		if (linkText) {
 			if (/^(?:https?|ftp):/i.test(linkText)) {
 				try {
@@ -253,14 +275,13 @@ nsContextMenu.prototype.initOpenItems = function() {
 				this.linkURL = this.linkURI.spec;
 				onPlainTextLink = true;
 			}
-		} else {
-			abs = [document.popupNode, document.popupRangeParent,
-                   document.popupRangeOffset]
 		}
     }
 
     var shouldShow = this.onSaveableLink || isMailtoInternal || onPlainTextLink;
-    this.showItem("context-openlinkintab", shouldShow);
+	item.hidden = !shouldShow
+	if (shouldShow)
+		item.linkText = this.linkURL
 }
 
 
