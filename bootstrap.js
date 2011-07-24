@@ -21,7 +21,7 @@ var xml =
 	</panel>
 xml=xml.toXMLString()
 
-function appendXML(document){
+appendXML = function(document){
 	var mainPopupSet = document.getElementById("mainPopupSet")
 	var range = document.createRange()
 	range.selectNode(mainPopupSet)
@@ -277,7 +277,8 @@ function unloadFromWindow(mWindow){
 WindowListener={
 	onOpenWindow: function(aWindow){
 		// Wait for the window to finish loading
-		let domWindow = aWindow.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowInternal).window;
+		let domWindow = aWindow.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowInternal||Ci.nsIDOMWindow).window;
+		// see https://bugzilla.mozilla.org/show_bug.cgi?id=670235 for Ci.nsIDOMWindowInternal||Ci.nsIDOMWindow
 		domWindow.addEventListener("load", function() {
 			domWindow.removeEventListener("load", arguments.callee, false);
 			if(domWindow.CombinedStopReload)
