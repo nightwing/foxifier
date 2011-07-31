@@ -240,20 +240,35 @@ nsContextMenu.prototype.initOpenItems = function() {
         let linkText = this.isTextSelected;
 
 		if (!linkText) {
-			var r = /https?:\/\/[\w\.\/\-\d]+/
-
+			//varty = [document.popupRangeParent, document.popupRangeOffset]
 			var text = document.popupRangeParent.textContent
 			var l = document.popupRangeOffset
-			var match
-			while(match = text.match(r)){
-				var end = match.index+match[0].length
-				if (match.index > l)
-					break
+			
+			var i = text.lastIndexOf(' ', l)
+			text = text.substr(i).replace(/\s/g, ' ')
+			l = l-i
+			
+			findMatch = function(r){
+				var match
+				while(match = r.exec(text)){
+					var end = match.index+match[0].length
+					if (match.index > l)
+						break
 
-				if (end > l)
-					linkText = match[0]
-				text = text.substr(end )
-			}	
+					if (end > l){
+						linkText = match[0]
+						break
+					}
+				}
+				return linkText
+			}
+			
+			findMatch(/https?:\/\/[^\s]+/ig) ||
+			findMatch(/www\.[^\s]+/ig) ||
+			findMatch(/\w+\.\w+[^\s]*/ig)
+
+			if(linkText && ')>}]'.indexOf(linkText[linkText.length-1])!=-1)
+				linkText = linkText.slice(0, -1)
 		}
 
 		if (linkText) {
