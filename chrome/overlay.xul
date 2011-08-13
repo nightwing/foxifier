@@ -66,6 +66,7 @@
       <menuitem id="context-forward"  removeelement="true"/>
       <menuitem id="context-reload"  removeelement="true"/>
       <menuitem id="context-stop"  removeelement="true"/>
+      <menuseparator id="context-sep-selectall" removeelement="true"/>
       <menuseparator id="context-sep-stop" removeelement="true"/>
       <menuitem id="context-bookmarkpage"  removeelement="true"/>
       <menuitem id="context-sendpage"  removeelement="true"/>

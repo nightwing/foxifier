@@ -237,7 +237,7 @@ nsContextMenu.prototype.initOpenItems = function() {
     var onPlainTextLink = false;
     if (!this.onLink) {
         let uri;
-        let linkText = this.isTextSelected;
+        var linkText = this.isTextSelected;
 
 		if (!linkText) {
 			//varty = [document.popupRangeParent, document.popupRangeOffset]
@@ -245,9 +245,10 @@ nsContextMenu.prototype.initOpenItems = function() {
 			var l = document.popupRangeOffset
 			
 			var i = text.lastIndexOf(' ', l)
-			text = text.substr(i).replace(/\s/g, ' ')
-			l = l-i
-			
+			if (i !=-1){
+				text = text.substr(i).replace(/\s/g, ' ')
+				l = l-i
+			}
 			findMatch = function(r){
 				var match
 				while(match = r.exec(text)){
@@ -265,10 +266,11 @@ nsContextMenu.prototype.initOpenItems = function() {
 			
 			findMatch(/https?:\/\/[^\s]+/ig) ||
 			findMatch(/www\.[^\s]+/ig) ||
-			findMatch(/\w+\.\w+[^\s]*/ig)
+			findMatch(/[a-z\d-]+\.[a-z\d-]+[^\s]*/ig)
 
-			if(linkText && ')>}]'.indexOf(linkText[linkText.length-1])!=-1)
-				linkText = linkText.slice(0, -1)
+
+			if(linkText)
+				linkText = linkText.replace(/[\)\]\}\>\.;,]*$/, '')
 		}
 
 		if (linkText) {
@@ -278,7 +280,7 @@ nsContextMenu.prototype.initOpenItems = function() {
 				} catch (ex) {}
 			}
 			// Check if this could be a valid url, just missing the protocol.
-			else if (/^(?:[a-z\d-]+\.)+[a-z]+$/i.test(linkText)) {
+			else if (/^(?:[a-z\d-]+\.)+/i.test(linkText)) {
 				let uriFixup = Cc["@mozilla.org/docshell/urifixup;1"].getService(Ci.nsIURIFixup);
 				try {
 					uri = uriFixup.createFixupURI(linkText, uriFixup.FIXUP_FLAG_NONE);
@@ -287,13 +289,14 @@ nsContextMenu.prototype.initOpenItems = function() {
 
 			if (uri && uri.host) {
 				this.linkURI = uri;
-				this.linkURL = this.linkURI.spec;
+				this.linkURL = uri.spec;
 				onPlainTextLink = true;
 			}
 		}
     }
 
     var shouldShow = this.onSaveableLink || isMailtoInternal || onPlainTextLink;
+	this.showItem("context-sep-open", shouldShow || this.isTextSelected);
 	item.hidden = !shouldShow
 	if (shouldShow)
 		item.linkText = this.linkURL
@@ -324,14 +327,14 @@ XULBrowserWindow.updateStatusField = function () {
     }
 }
 
-XULBrowserWindow.onProgressChange= function (aWebProgress, aRequest,
+XULBrowserWindow.onProgressChange = function (aWebProgress, aRequest,
 		aCurSelfProgress, aMaxSelfProgress, aCurTotalProgress, aMaxTotalProgress) {
     if (aMaxTotalProgress > 0 && this._busyUI){
 		let percentage = (aCurTotalProgress * 100) / aMaxTotalProgress;
 		this.throbberElement.el.value = percentage;
 	}
 }
-XULBrowserWindow.throbberElement={
+XULBrowserWindow.throbberElement = {
 	setAttribute:function(){this.el.collapsed=false},
 	removeAttribute:function(){this.el.collapsed=true;this.el.value=0}
 }
@@ -533,4 +536,4 @@ var cookieSwap = {
 }
 // Services.cookies is missing on ff4 
 if(!Services.cookies)
-	Services.cookies=Cc["@mozilla.org/cookiemanager;1"].getService(Ci.nsICookieManager2)
+	Services.cookies = Cc["@mozilla.org/cookiemanager;1"].getService(Ci.nsICookieManager2)
