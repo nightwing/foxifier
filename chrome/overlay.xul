@@ -118,6 +118,7 @@
          <menuitem value="3" label="3" type='radio'/>
          <menuitem value="4" label="4" type='radio'/>
          <menuitem value="5" label="5" type='radio'/>
+         <menuitem value="6" label="6" type='radio'/>
          <menuitem value="empty" label="empty" type='radio'/>
 
          <menuseparator id="cookie-profile-list-separator" />

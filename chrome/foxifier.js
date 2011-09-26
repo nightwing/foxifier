@@ -101,7 +101,7 @@ nsContextMenu.prototype.openLinkIn = function(e) {
 		return
 	var where = e.originalTarget.getAttribute('where')
 	if(!where)
-		where = e.button!=0 ? "current":"tab";
+		where = e.button>1 ? "current":"tab";
     var doc = this.target.ownerDocument;
     openLinkIn(this.linkURL, where, { charset: doc.characterSet,
         referrerURI: doc.documentURIObject });
@@ -350,9 +350,13 @@ XULBrowserWindow.init = function () {
     this.onSecurityChange(null, null, securityUI.state);
 }
 /***************************************************************************
- *   remove annoying shortcuts
+ *   remove annoying shortcuts and "features"
  */
 BrowserHandleBackspace = BrowserHandleShiftBackspace = dump
+
+/*	TabsInTitlebar.uninit()
+	TabsInTitlebar=null
+	updateAppButtonDisplay = dump */
 //gFindBar._shouldFastFind=function(){}
 /*gFindBar._onBrowserKeypress = function(aEvent) {
     if (!this._shouldFastFind(aEvent))
