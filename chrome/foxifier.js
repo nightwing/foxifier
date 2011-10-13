@@ -234,66 +234,42 @@ nsContextMenu.prototype.initOpenItems = function() {
 
     // Time to do some bad things and see if we've highlighted a URL that
     // isn't actually linked.
-    var onPlainTextLink = false;
-    if (!this.onLink) {
-        let uri;
-        var linkText = this.isTextSelected;
-
-		if (!linkText) {
-			//varty = [document.popupRangeParent, document.popupRangeOffset]
-			var text = document.popupRangeParent.textContent
-			var l = document.popupRangeOffset
-			
-			var i = text.lastIndexOf(' ', l)
-			if (i !=-1){
-				text = text.substr(i).replace(/\s/g, ' ')
-				l = l-i
-			}
-			findMatch = function(r){
-				var match
-				while(match = r.exec(text)){
-					var end = match.index+match[0].length
-					if (match.index > l)
-						break
-
-					if (end > l){
-						linkText = match[0]
-						break
-					}
-				}
-				return linkText
-			}
-			
-			findMatch(/https?:\/\/[^\s]+/ig) ||
-			findMatch(/www\.[^\s]+/ig) ||
-			findMatch(/[a-z\d-]+\.[a-z\d-]+[^\s]*/ig)
-
-
-			if(linkText)
-				linkText = linkText.replace(/[\)\]\}\>\.;,]*$/, '')
+    var onPlainTextLink = false
+	dump(
+		this.onLink,
+		nsContextMenu.isMouseOver(document.popupNode),
+		nsContextMenu.isMouseOverSelection(),
+		nsContextMenu.getPlainLinkText()
+	)
+	var linkText = this.isTextSelected;
+	if(linkText && !nsContextMenu.isMouseOverSelection()){
+		linkText = ""
+	}
+	if (!linkText && !this.onLink) {
+		linkText = nsContextMenu.getPlainLinkText() || this.isTextSelected
+	}
+	
+	if (linkText) {
+		var uri;
+		if (/^(?:https?|ftp):/i.test(linkText)) {
+			try {
+				uri = makeURI(linkText);
+			} catch (ex) {}
+		}
+		// Check if this could be a valid url, just missing the protocol.
+		else if (/^(?:[a-z\d-]+\.)+/i.test(linkText)) {
+			let uriFixup = Cc["@mozilla.org/docshell/urifixup;1"].getService(Ci.nsIURIFixup);
+			try {
+				uri = uriFixup.createFixupURI(linkText, uriFixup.FIXUP_FLAG_NONE);
+			} catch (ex) {}		
 		}
 
-		if (linkText) {
-			if (/^(?:https?|ftp):/i.test(linkText)) {
-				try {
-					uri = makeURI(linkText);
-				} catch (ex) {}
-			}
-			// Check if this could be a valid url, just missing the protocol.
-			else if (/^(?:[a-z\d-]+\.)+/i.test(linkText)) {
-				let uriFixup = Cc["@mozilla.org/docshell/urifixup;1"].getService(Ci.nsIURIFixup);
-				try {
-					uri = uriFixup.createFixupURI(linkText, uriFixup.FIXUP_FLAG_NONE);
-				} catch (ex) {}		
-			}
-
-			if (uri && uri.host) {
-				this.linkURI = uri;
-				this.linkURL = uri.spec;
-				onPlainTextLink = true;
-			}
+		if (uri && uri.host) {
+			this.linkURI = uri;
+			this.linkURL = uri.spec;
+			onPlainTextLink = true;
 		}
-    }
+	}
 
     var shouldShow = this.onSaveableLink || isMailtoInternal || onPlainTextLink;
 	this.showItem("context-sep-open", shouldShow || this.isTextSelected);
@@ -301,8 +277,59 @@ nsContextMenu.prototype.initOpenItems = function() {
 	if (shouldShow)
 		item.linkText = this.linkURL
 }
+nsContextMenu.getPlainLinkText = function(){
+	var linkText = ""
+	var text = document.popupRangeParent.textContent
+	var l = document.popupRangeOffset
+	
+	var i = text.lastIndexOf(' ', l)
+	if (i !=-1){
+		text = text.substr(i).replace(/\s/g, ' ')
+		l = l-i
+	}
+	var findMatch = function(r){
+		var match
+		while(match = r.exec(text)){
+			var end = match.index+match[0].length
+			if (match.index > l)
+				break
 
+			if (end > l){
+				linkText = match[0]
+				break
+			}
+		}
+		return linkText
+	}
+	
+	findMatch(/https?:\/\/[^\s]+/ig) ||
+	findMatch(/www\.[^\s]+/ig) ||
+	findMatch(/[a-z\d-]+\.[a-z\d-]+[^\s]*/ig)
 
+	return linkText.replace(/[\)\]\}\>\.;,]*$/, '')
+}
+nsContextMenu.isMouseOver = function(item){
+	var rect = item.getBoundingClientRect()
+	var x = this.lastEvent.x, y = this.lastEvent.y
+	if(x < rect.right && x > rect.left && y < rect.bottom && y > rect.top)
+		return true
+}
+nsContextMenu.isMouseOverSelection = function(){
+	try{
+		var pn = document.popupNode
+		if(pn instanceof Ci.nsIDOMNSEditableElement){
+			var sel = pn.QueryInterface(Ci.nsIDOMNSEditableElement).editor.selection
+		}else
+			var sel = pn.ownerDocument.defaultView.getSelection()
+		return this.isMouseOver(sel.getRangeAt(0))
+	}catch(e){
+		dump(e)
+		return true
+	}
+}
+gBrowser.addEventListener("mouseup", nsContextMenu.saveMousePos = function(e){
+    nsContextMenu.lastEvent={x:e.clientX,y:e.clientY,b:e.button,time: e.timeStamp}
+})
 /***************************************************************************
  *   status 4 evar
  */
