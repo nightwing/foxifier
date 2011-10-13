@@ -48,7 +48,7 @@ toOpenWindowByURI=function(uri){
 
 // undo close tab
 function PHMM_populateUndoSubmenu(popup) {
-	window._ss = window._ss||Cc["@mozilla.org/browser/sessionstore;1"].getService(Ci.nsISessionStore)
+	var _ss = Cc["@mozilla.org/browser/sessionstore;1"].getService(Ci.nsISessionStore)
     var undoMenu = popup.parentNode;
     var undoPopup = popup;
     while (undoPopup.hasChildNodes()) {
@@ -72,7 +72,6 @@ function PHMM_populateUndoSubmenu(popup) {
         }
         m.setAttribute("class", "menuitem-iconic bookmark-item menuitem-with-favicon");
         m.setAttribute("value", i);
-        m.setAttribute("oncommand", "undoCloseTab(" + i + ");");
         //m.setAttribute("closemenu", "none");
         let tabData = undoItems[i].state;
         let activeIndex = (tabData.index || tabData.entries.length) - 1;
@@ -184,6 +183,7 @@ nsContextMenu.prototype.doSearch = function(e) {
     }
     openLinkIn(submission.uri.spec, e.button!=0?"current":"tab", {postData: submission.postData, relatedToCurrent: true});
 }
+// disable haveSetDesktopBackground
 nsContextMenu.prototype.initViewItems = function() {
     // View source is always OK, unless in directory listing.
     this.showItem("context-viewpartialsource-selection",
