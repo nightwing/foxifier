@@ -1,0 +1,21 @@
+#appmenu-button {
+  background-image: -moz-linear-gradient(rgb(247,182,82), rgb(215,98,10) 95%);
+  border-color: rgba(83,42,6,.9);
+  box-shadow: 0 1px 0 rgba(255,255,255,.25) inset,
+              0 0 0 1px rgba(255,255,255,.25) inset;
+}
+#appmenu-button:hover:not(:active):not([open]) {
+  background-image: -moz-radial-gradient(center bottom, farthest-side, rgba(252,240,89,.5) 10%, rgba(252,240,89,0) 70%),
+                    -moz-radial-gradient(center bottom, farthest-side, rgb(236,133,0), rgba(255,229,172,0)),
+                    -moz-linear-gradient(rgb(246,170,69), rgb(209,74,0) 95%);
+  border-color: rgba(83,42,6,.9);
+  box-shadow: 0 1px 0 rgba(255,255,255,.1) inset,
+              0 0 2px 1px rgba(250,234,169,.7) inset,
+              0 -1px 0 rgba(250,234,169,.5) inset;
+}
+#appmenu-button:hover:active,
+#appmenu-button[open] {
+  background-image: -moz-linear-gradient(rgb(246,170,69), rgb(209,74,0) 95%);
+  box-shadow: 0 2px 3px rgba(0,0,0,.4) inset,
+              0 1px 1px rgba(0,0,0,.2) inset;
+}

@@ -1,0 +1,138 @@
+<?xml version="1.0"?>
+
+<overlay id="tab_history_overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">	
+	<script type="application/x-javascript" src="foxifier.js"></script>
+	
+	<menupopup id="tabContextMenu">
+	  <menuitem id="context_duplicate" insertbefore="context_reloadTab" label="Duplicate" accesskey="D" 
+				oncommand="
+		var tab=gBrowser.mContextTab||gBrowser.mCurrentTab;
+		var newTab = Cc['@mozilla.org/browser/sessionstore;1'].getService(Ci.nsISessionStore).duplicateTab(window, tab, 0);
+			gBrowser.moveTabTo(newTab,tab._tPos)"
+	  />
+	  <menuitem id="context_undoCloseTab" 
+	            
+				removeelement="true"/>
+	  <menu id="context_undoCloseTab" type='splitmenu' label="Undo Close Tab"  closemenu="none"
+			accesskey="U" observes="History:UndoCloseTab" oncommand="undoCloseTab(event.target.getAttribute('value'));" position="1">
+			<menupopup 	onpopupshowing="PHMM_populateUndoSubmenu.call(document.getElementById('history-menu')._placesView,this)"/>
+	  </menu>
+	  <menuitem id="context_duplicate" insertbefore="context_reloadTab" label="Duplicate" accesskey="D" 
+				oncommand="
+		var tab=gBrowser.mContextTab||gBrowser.mCurrentTab;
+		var newTab = Cc['@mozilla.org/browser/sessionstore;1'].getService(Ci.nsISessionStore).duplicateTab(window, tab, 0);
+			gBrowser.moveTabTo(newTab,tab._tPos);/*gBrowser.removeTab(tab, {animate: false, byMouse: false})*/"
+	  />
+	</menupopup>
+	
+	
+	
+<menupopup id="contentAreaContextMenu"
+	   onpopupshowing="if (event.target != this)
+						 return true;
+					   gContextMenu = new nsContextMenu(this, gBrowser);
+					   if (gContextMenu.shouldDisplay)
+						 updateEditUIVisibility();
+					   return gContextMenu.shouldDisplay;"
+	   onpopuphiding="if (event.target == this) { gContextMenu = null; updateEditUIVisibility(); }">
+
+      <menuitem id="context-openlinkintab" removeelement="true"/>
+	  <menu id="context-openlinkintab" type='splitmenu' label="Open Link in New Tab" 
+				onmouseover="window.XULBrowserWindow.setOverLink(this.linkText, null);"
+				onmouseout="window.XULBrowserWindow.setOverLink('', null);"
+				onclick="gContextMenu.openLinkIn(event);" insertbefore='context-sep-open'>
+			<menupopup>
+				<menuitem label="here" where='current'/>			
+				<menuitem label="foreground" where='tabshifted'/>			
+				<menuitem label="in new window" where='window'/>
+			</menupopup>
+	  </menu>
+	  <menu id="context-search" type='splitmenu' label=""  iconic="true" 
+			onclick='gContextMenu.doSearch(event)' insertbefore='context-sep-open'>
+			<menupopup 	onpopupshowing="gContextMenu.fillSearchSubmenu(this)"/>
+	  </menu>
+      <menuitem id="context-openlinkincurrent" removeelement="true"/>
+      <menuitem id="context-openlink" removeelement="true"/>
+      <menuseparator id="context-sep-open"/>
+      <menuitem id="context-bookmarklink" removeelement="true"/>
+      <menuitem id="context-sendlink" removeelement="true"/>
+      <menuitem id="context-copyemail" removeelement="true"/>
+      <menuitem id="context-sendimage"  removeelement="true"/>
+      <menuitem id="context-setDesktopBackground"  removeelement="true"/>
+      <menuitem id="context-sendvideo"  removeelement="true"/>
+      <menuitem id="context-sendaudio"  removeelement="true"/>
+      <menuitem id="context-back"  removeelement="true"/>
+      <menuitem id="context-forward"  removeelement="true"/>
+      <menuitem id="context-reload"  removeelement="true"/>
+      <menuitem id="context-stop"  removeelement="true"/>
+      <menuseparator id="context-sep-selectall" removeelement="true"/>
+      <menuseparator id="context-sep-stop" removeelement="true"/>
+      <menuitem id="context-bookmarkpage"  removeelement="true"/>
+      <menuitem id="context-sendpage"  removeelement="true"/>
+      <menuseparator id="context-sep-viewbgimage"/>
+      <!-- <menuitem id="context-keywordfield"
+                label="&keywordfield.label;"
+                accesskey="&keywordfield.accesskey;"
+                oncommand="AddKeywordForSearchField();"/> -->
+      <menuitem id="context-searchselect" removeelement="true"/>
+      <menuitem id="favicon-reload" removeelement="true"/>
+      <menuitem id="context-viewpartialsource-selection" removeelement="true"/>
+
+      <menuseparator id="frame-sep"/>
+<!--       <menu id="frame" label="&thisFrameMenu.label;" accesskey="&thisFrameMenu.accesskey;">
+      </menu> -->
+      <menuseparator hidden="true" id="context-sep-bidi"  removeelement="true"/>
+      <menuitem hidden="true" id="context-bidi-text-direction-toggle" removeelement="true"/>
+      <menuitem hidden="true" id="context-bidi-page-direction-toggle" removeelement="true"/>
+    </menupopup>
+
+    
+	
+	<textbox id="urlbar" pmpack="end">
+		<progressmeter id="urlbar-progress-alt"  mode="normal" value="0" collapsed="true" />
+	</textbox>
+	
+	
+	 <!-- cookieSwap -->
+	<statusbar id="status-bar" class="chromeclass-status">
+      <statusbarpanel id="cookieSwap-panel" 
+         tooltip="cookieswap-tooltip"
+		 popup="cookie-element-list"
+		 context="cookie-element-list"
+         ondblclick="" >
+         <hbox align='center'>
+             <image id="cookieswap-status-bar-icon" src="http://g.etfv.co/https://mail.google.com/mail" /> 
+             <!-- <label value="mail" /> -->
+         </hbox>
+      </statusbarpanel>
+   </statusbar>
+
+   <popupset id="mainPopupSet">
+      <menupopup id="cookie-element-list" oncommand="cookieSwap.onPopupCommand(event)"
+			 onpopupshown="var p = this.getElementsByAttribute('value', cookieSwap.profiles.__currentProfile__)[0]||
+				this.getElementsByAttribute('value', 'empty')[0];
+				p.setAttribute('checked', true)">
+         <menuitem value="1" label="1" type='radio'/>
+         <menuitem value="2" label="2" type='radio'/>
+         <menuitem value="3" label="3" type='radio'/>
+         <menuitem value="4" label="4" type='radio'/>
+         <menuitem value="5" label="5" type='radio'/>
+         <menuitem value="6" label="6" type='radio'/>
+         <menuitem value="empty" label="empty" type='radio'/>
+
+         <menuseparator id="cookie-profile-list-separator" />
+         <menuitem id="cookieswap-menu-help" label="Help"    
+                   oncommand="gBrowser.selectedTab = gBrowser.addTab('http://cookieswap.mozdev.org/help.html')" />
+      </menupopup>
+      
+      <tooltip id="cookieswap-tooltip" insertafter="backMenu">
+         <vbox flex="1">
+             <label id="cookieswap-tooltip0" value="CookieSwap:"/>
+             <label id="cookieswap-tooltip2" value="right click select a new profile and reload"/>
+             <label id="cookieswap-tooltip1" value="Click select a new profile and load mail"/>
+         </vbox>
+      </tooltip>
+   </popupset>
+   
+	
+</overlay>
