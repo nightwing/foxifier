@@ -3,7 +3,7 @@
        xmlns:r="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <r:Description about="urn:mozilla:install-manifest">
     <description>adds a context menu to stop/reload for more fine grained control over page loading</description>
-    <creator>blackadder</creator>
+    <creator>someone</creator>
     <homepageURL>http://foximirror.blogspot.com/</homepageURL>
     <id>absolute@load.control.am</id>
     <name>absolute load control</name>

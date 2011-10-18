@@ -1,0 +1,11 @@
+<?xml version="1.0"?>  
+  
+<vbox xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">  
+<setting pref="extensions.alc.options2" type="radio" title="allow redirects" desc="Stored as a boolean preference">  
+  <radiogroup>  
+    <radio value="io" label="all(default)"/>  
+    <radio value="iou" label="only redirects"/>  
+    <radio value="opi" label="none"/>  
+  </radiogroup>  
+</setting>  
+</vbox> 
