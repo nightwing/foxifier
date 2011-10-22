@@ -94,133 +94,149 @@ function PHMM_populateUndoSubmenu(popup) {
 
 /*********************************************************************************
  ** contextMenu **
- */
-nsContextMenu.prototype.openLinkIn = function(e) {
-	if(e.originalTarget.localName != 'menuitem')
-		return
-	var where = e.originalTarget.getAttribute('where')
-	if(!where)
-		where = e.button>1 ? "current":"tab";
-    var doc = this.target.ownerDocument;
-    openLinkIn(this.linkURL, where, { charset: doc.characterSet,
-        referrerURI: doc.documentURIObject });
-}
-nsContextMenu.prototype.getSelectedText = function() {
-	var selectedText = getBrowserSelection();
+ **/
 
-    if (selectedText)
-		return selectedText
-	try{
-		var editor = content.document.activeElement
-			.QueryInterface(Ci.nsIDOMNSEditableElement).editor
-	}catch(e){
-		try{
-			var editor = document.popupNode
-				.QueryInterface(Ci.nsIDOMNSEditableElement).editor
-		}catch(e){}
+modifyContextMenu = function(enable){
+	if (enable == undefined) {
+		let pname = "extensions.InstantFox.context.usedefault"
+		enable = !(Services.prefs.prefHasUserValue(pname) && Services.prefs.getBoolPref(pname))
 	}
-	try{
-		return editor.selection.toString()
-	}catch(e){}
-	
-}
-nsContextMenu.prototype.isTextSelection = function() {
-	var menu = document.getElementById("context-search")
+	let proto = nsContextMenu.prototype
+	if(enable && !proto.isTextSelection_orig){
+		proto.isTextSelection_orig = proto.isTextSelection_orig || proto.isTextSelection 
+		proto.isTextSelection = function() {
+			var splitMenu = document.getElementById("ifox-context-searchselect") || this.createSearchItem()
+			var menuitem = splitMenu.menuitem
 
-    var selectedText = this.getSelectedText()
-	
-	if (!selectedText){
-		menu.hidden = true
-		return false;
-	}
-	
-	var croppedText = selectedText
-    if (selectedText.length > 15)
-      croppedText = selectedText.substr(0,15) + this.ellipsis;
+			var selectedText = this.getSelectedText(), croppedText = selectedText
 
-    // Use the current engine if the search bar is visible, the default
-    // engine otherwise.
-    var engine = Services.search[isElementVisible(BrowserSearch.searchBar)?
-												"currentEngine": "defaultEngine"];
-  
-    // format "Search <engine> for <selection>" string to show in menu
-    var menuLabel = gNavigatorBundle.getFormattedString("contextMenuSearchText", [engine.name, croppedText]);
-	
-	if(menu){
-		menu.label = menuLabel;
-		menu.image = engine.iconURI.spec
-		menu.item.setAttribute('name', engine.name)
-		menu.accessKey = gNavigatorBundle.getString("contextMenuSearchText.accesskey"); 
-		menu.hidden = false
-	}
-	// this makes isSelectedText be cache the selected text
-    return selectedText;
-}
-nsContextMenu.prototype.fillSearchSubmenu = function(popup) {
-	var menu
-	while(menu = popup.firstChild)
-		popup.removeChild(menu)
-	Services.search.getVisibleEngines().forEach(function(engine){
-		menu = document.createElement('menuitem')
-		menu.setAttribute('name', engine.name)
-		menu.setAttribute('label', engine.name)
-		menu.setAttribute('image', engine.iconURI.spec)
-		menu.setAttribute('class', "menuitem-iconic")		
-		popup.appendChild(menu)
-	})
-}
-nsContextMenu.prototype.doSearch = function(e) {
-	var name = e.originalTarget.getAttribute('name')
-	if(!name)
-		return
-	var selectedText = this.getSelectedText()
-	if(name == 'open as link')
-		openLinkIn(selectedText, e.button!=0?"current":"tab", {relatedToCurrent: true});
-    var engine = Services.search.getEngineByName(name);
-    var submission = engine.getSubmission(selectedText);
-    if (!submission) {
-        return;
-    }
-    openLinkIn(submission.uri.spec, e.button!=0?"current":"tab", {postData: submission.postData, relatedToCurrent: true});
-}
-// disable haveSetDesktopBackground
-nsContextMenu.prototype.initViewItems = function() {
-    // View source is always OK, unless in directory listing.
-    this.showItem("context-viewpartialsource-selection",
-                  this.isContentSelected);
-    this.showItem("context-viewpartialsource-mathml",
-                  this.onMathML && !this.isContentSelected);
+			if (!selectedText) {
+				splitMenu.hidden = true
+				return false;
+			}
 
-    var shouldShow = !(this.isContentSelected ||
-                       this.onImage || this.onCanvas ||
-                       this.onVideo || this.onAudio ||
-                       this.onLink || this.onTextInput);
-    this.showItem("context-viewsource", shouldShow);
-    this.showItem("context-viewinfo", shouldShow);
+			if (selectedText.length > 15)
+				croppedText = selectedText.substr(0,15) + this.ellipsis;
 
-    this.showItem("context-sep-viewsource", shouldShow);
+			var engine = Services.search[
+				isElementVisible(BrowserSearch.searchBar)?"currentEngine": "defaultEngine"
+			];
 
-    // Reload image depends on an image that's not fully loaded
-    this.showItem("context-reloadimage", (this.onImage && !this.onCompletedImage));
+			// format "Search <engine> for <selection>" string to show in menu
+			var menuLabel = gNavigatorBundle.getFormattedString(
+												"contextMenuSearchText", [engine.name, croppedText]);
+			if(menuitem){
+				menuitem.label = menuLabel;
+				menuitem.image = engine.iconURI.spec
+				splitMenu.setAttribute('name', engine.name)
+				splitMenu.setAttribute('pluginType', "instantFox")
+				menuitem.accessKey = gNavigatorBundle.getString("contextMenuSearchText.accesskey");
+				splitMenu.hidden = false
+			}
 
-    // View image depends on having an image that's not standalone
-    // (or is in a frame), or a canvas.
-    this.showItem("context-viewimage", (this.onImage &&
-                  (!this.onStandaloneImage || this.inFrame)) || this.onCanvas);
+			return croppedText;
+		}
 
-    this.showItem("context-viewvideo", this.onVideo);
-    this.setItemAttr("context-viewvideo",  "disabled", !this.mediaURL);
+		proto.createSearchItem = function(){
+			var old = document.getElementById("context-searchselect")
+			if(old){
+				nsContextMenu.prototype.oldNode = old
+				nsContextMenu.prototype.oldNodePosId = old.nextSibling && old.nextSibling.id
+				old.parentNode.removeChild(old)
+			}
 
-    // View background image depends on whether there is one.
-    this.showItem("context-viewbgimage", shouldShow && !this._hasMultipleBGImages);
-    this.showItem("context-sep-viewbgimage", shouldShow && !this._hasMultipleBGImages);
-    document.getElementById("context-viewbgimage")
-            .disabled = !this.hasBGImage;
+			var m = document.createElement('menu')
+			m.setAttribute('id', "ifox-context-searchselect")
+			m.setAttribute('type', "splitmenu")
+			m.setAttribute('onclick', "gContextMenu&&gContextMenu.doSearch(event)")
+			m.setAttribute('oncommand', "gContextMenu&&gContextMenu.doSearch(event)")
+			m.setAttribute('class', "menu-non-iconic")
 
-    this.showItem("context-viewimageinfo", this.onImage);
-}
+			var p = document.createElement('menupopup')
+			p.setAttribute('onpopupshowing', "gContextMenu.fillSearchSubmenu(this)")
 
-nsContextMenu.prototype.initOpenItems = function() {
+			m.appendChild(p)
+
+			var s = document.getElementById("context-sep-open")
+
+			var c = document.getElementById("contentAreaContextMenu")
+			c.insertBefore(m, s)
+			return m
+		}
+		proto.getSelectedText = function() {
+			var selectedText = getBrowserSelection();
+
+			if (selectedText)
+				return selectedText
+			try{
+				var editor = content.document.activeElement
+					.QueryInterface(Ci.nsIDOMNSEditableElement).editor
+			}catch(e){
+				try{
+					var editor = document.popupNode
+						.QueryInterface(Ci.nsIDOMNSEditableElement).editor
+				}catch(e){}
+			}
+			try{
+				return editor.selection.toString()
+			}catch(e){}
+			return ''
+		}
+		proto.fillSearchSubmenu = function(popup) {
+			var menu
+			while(menu = popup.firstChild)
+				popup.removeChild(menu)
+			Services.search.getVisibleEngines().forEach(function(engine){
+				menu = document.createElement('menuitem')
+				menu.setAttribute('name', engine.name)
+				menu.setAttribute('label', engine.name)
+				menu.setAttribute('image', engine.iconURI.spec)
+				menu.setAttribute('class', "menuitem-iconic")		
+				popup.appendChild(menu)
+			})
+		}
+		proto.doSearch = function(e) {
+			var name = e.target.getAttribute('name')
+			if(!name)
+				return
+			var selectedText = this.getSelectedText()
+			
+			var engine = Services.search.getEngineByName(name);
+			var submission = engine.getSubmission(selectedText);
+			if (!submission) {
+				return;
+			}
+			var href = submission.uri.spec
+			var postData = submission.postData
+			
+			this.openLinkIn(href, e, postData);
+		}
+		proto.openLinkIn = function(href, e, postData, fixup){			
+			var where = e.target.getAttribute('where') || "tab"
+			if(e.button == 1)
+				where = "tabshifted"
+			else if(e.button == 2)
+				where = "current"
+			if(e.ctrlKey || e.altKey){
+				if(where == 'tab')
+					where = 'tabshifted'
+				else if(where == 'tabshifted')
+					where = 'tab';
+			}else if(e.shiftKey && where != 'current')
+				where = 'current';
+			
+			openLinkIn(href, where, fixup||{postData: postData, relatedToCurrent: true});
+		}
+		proto.linkClick = function(e){
+			var doc = this.target.ownerDocument;
+			this.openLinkIn(this.linkURL, e, null, {
+					charset: doc.characterSet,
+					referrerURI: doc.documentURIObject
+			})
+		}
+
+proto.initOpenItems_orig = proto.initOpenItems_orig || proto.initOpenItems 
+proto.initOpenItems = function() {
     var item = document.getElementById("context-openlinkintab")
 	if(!item)
 		return;
@@ -329,7 +345,68 @@ nsContextMenu.isMouseOverSelection = function(){
 }
 gBrowser.addEventListener("mouseup", nsContextMenu.saveMousePos = function(e){
     nsContextMenu.lastEvent={x:e.clientX,y:e.clientY,b:e.button,time: e.timeStamp}
-})
+}, false)
+	}
+	else if(!enable && proto.isTextSelection_orig){
+		proto.isTextSelection = proto.isTextSelection_orig
+		
+		gBrowser.removeEventListener("mouseup", nsContextMenu.saveMousePos, false)
+		delete nsContextMenu.getPlainLinkText
+		delete nsContextMenu.isMouseOver
+		delete nsContextMenu.isMouseOverSelection
+		
+		delete proto.isTextSelection_orig 
+		delete proto.createSearchItem 
+		delete proto.getSelectedText 
+		delete proto.fillSearchSubmenu 
+		delete proto.doSearch 
+		delete proto.openLinkIn 
+		let popup = document.getElementById("contentAreaContextMenu")
+		let node = document.getElementById("ifox-context-searchselect")
+		node && node.parentNode.removeChild(node)
+		popup.insertBefore(proto.oldNode, proto.oldNodePosId && document.getElementById(proto.oldNodePosId))
+	}
+
+}
+modifyContextMenu()
+
+// disable haveSetDesktopBackground
+nsContextMenu.prototype.initViewItems = function() {
+    // View source is always OK, unless in directory listing.
+    this.showItem("context-viewpartialsource-selection",
+                  this.isContentSelected);
+    this.showItem("context-viewpartialsource-mathml",
+                  this.onMathML && !this.isContentSelected);
+
+    var shouldShow = !(this.isContentSelected ||
+                       this.onImage || this.onCanvas ||
+                       this.onVideo || this.onAudio ||
+                       this.onLink || this.onTextInput);
+    this.showItem("context-viewsource", shouldShow);
+    this.showItem("context-viewinfo", shouldShow);
+
+    this.showItem("context-sep-viewsource", shouldShow);
+
+    // Reload image depends on an image that's not fully loaded
+    this.showItem("context-reloadimage", (this.onImage && !this.onCompletedImage));
+
+    // View image depends on having an image that's not standalone
+    // (or is in a frame), or a canvas.
+    this.showItem("context-viewimage", (this.onImage &&
+                  (!this.onStandaloneImage || this.inFrame)) || this.onCanvas);
+
+    this.showItem("context-viewvideo", this.onVideo);
+    this.setItemAttr("context-viewvideo",  "disabled", !this.mediaURL);
+
+    // View background image depends on whether there is one.
+    this.showItem("context-viewbgimage", shouldShow && !this._hasMultipleBGImages);
+    this.showItem("context-sep-viewbgimage", shouldShow && !this._hasMultipleBGImages);
+    document.getElementById("context-viewbgimage")
+            .disabled = !this.hasBGImage;
+
+    this.showItem("context-viewimageinfo", this.onImage);
+}
+
 /***************************************************************************
  *   status 4 evar
  */

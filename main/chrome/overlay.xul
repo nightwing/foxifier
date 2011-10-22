@@ -37,17 +37,13 @@
 	  <menu id="context-openlinkintab" type='splitmenu' label="Open Link in New Tab" 
 				onmouseover="window.XULBrowserWindow.setOverLink(this.linkText, null);"
 				onmouseout="window.XULBrowserWindow.setOverLink('', null);"
-				onclick="gContextMenu.openLinkIn(event);" insertbefore='context-sep-open'>
+				onclick="gContextMenu.linkClick(event);" insertbefore='context-sep-open'>
 			<menupopup>
-				<menuitem label="here" where='current'/>			
-				<menuitem label="foreground" where='tabshifted'/>			
+				<menuitem label="in current tab" where='current'/>			
+				<menuitem label="in foreground tab" where='tabshifted'/>			
 				<menuitem label="in new window" where='window'/>
 			</menupopup>
-	  </menu>
-	  <menu id="context-search" type='splitmenu' label=""  iconic="true" 
-			onclick='gContextMenu.doSearch(event)' insertbefore='context-sep-open'>
-			<menupopup 	onpopupshowing="gContextMenu.fillSearchSubmenu(this)"/>
-	  </menu>
+	  </menu>	  
       <menuitem id="context-openlinkincurrent" removeelement="true"/>
       <menuitem id="context-openlink" removeelement="true"/>
       <menuseparator id="context-sep-open"/>

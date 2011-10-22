@@ -6,11 +6,13 @@
 
 <binding id="splitmenu" extends="chrome://global/content/bindings/menu.xml#menuitem-base">
     <content align='stretch'>
-        <xul:menuitem anonid="item" flex="1"
-                    class="menuitem-tooltip split-menuitem-item"
-                    xbl:inherits="label,key,image,value,closemenu,disabled" allowevents='true'/>
-        <xul:hbox class="split-menu-right-image" xbl:inherits="_moz-menuactive" >
-            <xul:hbox align="center" class="menu-right" xbl:inherits="_moz-menuactive,disabled">
+		<xul:hbox anonid="item" flex="1" allowevents='true'>
+			<xul:menuitem anonid="menuitem" flex="1"
+                    class="menuitem-iconic-tooltip menuitem-iconic split-menuitem-item"
+                    xbl:inherits="label,key,image,value,closemenu,disabled" />
+        </xul:hbox>
+		<xul:hbox anonid="menu" xbl:inherits="_moz-menuactive" allowevents='true' class="split-menu-right-image" >
+            <xul:hbox align="center" class="menu-right" xbl:inherits="_moz-menuactive,disabled" style='pointer-events:none'>
                 <xul:image/>
             </xul:hbox>
         </xul:hbox>
@@ -18,21 +20,52 @@
     </content>
 
     <implementation implements="nsIDOMXULSelectControlItemElement, nsIDOMXULContainerItemElement, nsIAccessibleProvider">
-        <constructor><![CDATA[
-            if (this.getAttribute("iconic") == "true") {
-                this.item.classList.remove("menuitem-tooltip");
-                this.item.classList.add("menuitem-iconic-tooltip");
-                this.item.classList.add("menuitem-iconic");
-            }
-            // workaround for 3.6 bug
-            this.item.classList.add("split-menuitem-item");
-      ]]></constructor>
-	  <!-- <property name="value"
-                onget="return (this.hasAttribute('isempty') || this.hasAttribute('empty')) ? '' : this.inputField.value;"> -->
+      
       <field name="item" readonly="true">
             document.getAnonymousElementByAttribute(this, "anonid", "item");
       </field>
+      <field name="menuitem" readonly="true">
+            document.getAnonymousElementByAttribute(this, "anonid", "menuitem");
+      </field>
+      <field name="menu" readonly="true">
+            document.getAnonymousElementByAttribute(this, "anonid", "menu");
+      </field>
+      
+      
     </implementation>
+	<handlers>
+      <handler event="mouseover" phase="target"><![CDATA[
+      //this.menuitem.setAttribute("_moz-menuactive", true)
+      if(event.target!=this||event.originalTarget==this)  
+        return
+      if(event.originalTarget==this.menu){
+          this.menu.style.pointerEvents="none"
+          this.menuitem.removeAttribute("_moz-menuactive")
+          this.item.style.pointerEvents="" 
+      }else if(event.originalTarget==this.item){
+          if(this.hasAttribute("_moz-menuactive"))
+            this.menuitem.setAttribute("_moz-menuactive", true)
+          this.menu.style.pointerEvents=""
+          this.item.style.pointerEvents="none"
+      }
+      ]]></handler>
+      <handler event="mouseout" phase="target"><![CDATA[  
+      if(event.originalTarget==this){
+        this.menuitem.removeAttribute("_moz-menuactive")
+        this.item.style.pointerEvents="" 
+      }
+      ]]></handler>
+      <handler event="DOMMenuItemInactive" phase="target"><![CDATA[
+        this.menuitem.setAttribute("_moz-menuactive", false)
+      ]]></handler>
+      <handler event="DOMMenuItemActive" phase="target"><![CDATA[
+        if(this.item.style.pointerEvents=="none")
+            this.menuitem.setAttribute("_moz-menuactive", true)
+      ]]></handler>
+	  <handler event="click"><![CDATA[        	
+			event.button != 1 && this.parentNode.hidePopup();
+      ]]></handler>
+	</handlers>
 </binding>
 
 </bindings>
