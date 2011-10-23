@@ -45,8 +45,10 @@ toOpenWindowByURI=function(uri){
     window.open(uri, "_blank", "chrome,extrachrome,menubar,resizable,scrollbars,status,toolbar");
 
 }
-$ = function(x)document.getElementById(x)
-$.XML = function(element, xml, childBefore){
+// undo close tab
+rightContext = {}
+rightContext.$ = function(x)document.getElementById(x)
+rightContext.XML = function(element, xml, childBefore){
 	var range = element.ownerDocument.createRange()
 	range.selectNode(element)
 	range.collapse(true)
@@ -54,7 +56,7 @@ $.XML = function(element, xml, childBefore){
 
 	return element.insertBefore(fragment, childBefore)
 }
-$.elem = function(parent, name, props, before, children){
+rightContext.elem = function(parent, name, props, before, children){
 	if(typeof parent=="string"){
 		children = before
 		before = props
@@ -77,14 +79,13 @@ $.elem = function(parent, name, props, before, children){
 		parent.insertBefore(el, before)
 	return el
 }
-$.remove = function(el){
+rightContext.remove = function(el){
 	if(typeof el == "string")
-		el = $(el)
+		el = rightContext.$(el)
 	el && el.parentNode.removeChild(el)
 	return el
 }
-// undo close tab
-rightContext = {}
+
 rightContext.duplicate = function(){
 	var tab = gBrowser.mContextTab||gBrowser.mCurrentTab;
 	var newTab = Cc['@mozilla.org/browser/sessionstore;1'].getService(Ci.nsISessionStore).duplicateTab(window, tab, 0);
@@ -107,13 +108,13 @@ rightContext.undoCloseTab = function(e){
 	}
 }
 rightContext.createTabContextMenu = function() {
-	var tabContextMenu = $("tabContextMenu")
-	var oldEl = $.remove('context_undoCloseTab')
-	var oldEl = $.remove('context_reloadTab')
+	var tabContextMenu = rightContext.$("tabContextMenu")
+	var oldEl = rightContext.remove('context_undoCloseTab')
+	var oldEl = rightContext.remove('context_reloadTab')
 	
-	$.remove('context_duplicate')
+	rightContext.remove('context_duplicate')
 	
-	var menu = $.elem(tabContextMenu, 'menu',{
+	var menu = rightContext.elem(tabContextMenu, 'menu',{
 		id: "context_undoCloseTab",
 		label: "Undo Close Tab",
 		type: "splitmenu",
@@ -121,12 +122,12 @@ rightContext.createTabContextMenu = function() {
 		accesskey: "U",
 		observes: "History:UndoCloseTab"
 	}, 0)
-	$.elem(menu, 'menupopup', {
+	rightContext.elem(menu, 'menupopup', {
 		oncommand: "event.stopPropagation();rightContext.undoCloseTab(event)",
 		onclick: "event.stopPropagation();rightContext.undoCloseTab(event)",
 		onpopupshowing: "rightContext.populateUndoSubmenu(this)"
 	})
-	$.elem(tabContextMenu, 'menuitem', {
+	rightContext.elem(tabContextMenu, 'menuitem', {
 		id: "context_duplicate",
 		label: "Duplicate",
 		accesskey: "D",
@@ -179,148 +180,136 @@ rightContext.populateUndoSubmenu = function(popup) {
 /*********************************************************************************
  ** contextMenu **
  **/
+/*** called with this = gContextMenu **/
+rightContext.isTextSelection = function() {
+	var splitMenu = document.getElementById("ifox-context-searchselect") || rightContext.createSearchItem()
+	var menuitem = splitMenu.menuitem
 
-modifyContextMenu = function(enable){
-	if (enable == undefined) {
-		let pname = "extensions.InstantFox.context.usedefault"
-		enable = !(Services.prefs.prefHasUserValue(pname) && Services.prefs.getBoolPref(pname))
+	var selectedText = rightContext.getSelectedText(), croppedText = selectedText
+
+	if (!selectedText) {
+		splitMenu.hidden = true
+		return false;
 	}
-	let proto = nsContextMenu.prototype
-	if(enable && !proto.isTextSelection_orig){
-		proto.isTextSelection_orig = proto.isTextSelection_orig || proto.isTextSelection 
-		proto.isTextSelection = function() {
-			var splitMenu = document.getElementById("ifox-context-searchselect") || this.createSearchItem()
-			var menuitem = splitMenu.menuitem
 
-			var selectedText = this.getSelectedText(), croppedText = selectedText
+	if (selectedText.length > 15)
+		croppedText = selectedText.substr(0,15) + this.ellipsis;
 
-			if (!selectedText) {
-				splitMenu.hidden = true
-				return false;
-			}
+	var engine = Services.search[
+		isElementVisible(BrowserSearch.searchBar)?"currentEngine": "defaultEngine"
+	];
 
-			if (selectedText.length > 15)
-				croppedText = selectedText.substr(0,15) + this.ellipsis;
+	// format "Search <engine> for <selection>" string to show in menu
+	var menuLabel = gNavigatorBundle.getFormattedString(
+										"contextMenuSearchText", [engine.name, croppedText]);
+	if(menuitem){
+		menuitem.label = menuLabel;
+		menuitem.image = engine.iconURI.spec
+		splitMenu.setAttribute('name', engine.name)
+		splitMenu.setAttribute('pluginType', "instantFox")
+		menuitem.accessKey = gNavigatorBundle.getString("contextMenuSearchText.accesskey");
+		splitMenu.hidden = false
+	}
 
-			var engine = Services.search[
-				isElementVisible(BrowserSearch.searchBar)?"currentEngine": "defaultEngine"
-			];
+	return croppedText;
+}
+rightContext.createSearchItem = function(){
+	var old = document.getElementById("context-searchselect")
+	if(old){
+		nsContextMenu.prototype.oldNode = old
+		nsContextMenu.prototype.oldNodePosId = old.nextSibling && old.nextSibling.id
+		old.parentNode.removeChild(old)
+	}
 
-			// format "Search <engine> for <selection>" string to show in menu
-			var menuLabel = gNavigatorBundle.getFormattedString(
-												"contextMenuSearchText", [engine.name, croppedText]);
-			if(menuitem){
-				menuitem.label = menuLabel;
-				menuitem.image = engine.iconURI.spec
-				splitMenu.setAttribute('name', engine.name)
-				splitMenu.setAttribute('pluginType', "instantFox")
-				menuitem.accessKey = gNavigatorBundle.getString("contextMenuSearchText.accesskey");
-				splitMenu.hidden = false
-			}
+	var m = rightContext.elem('menu', {
+		id: "ifox-context-searchselect",
+		type: "splitmenu",
+		onclick: "gContextMenu&&rightContext.doSearch(event)",
+		oncommand: "gContextMenu&&rightContext.doSearch(event)",
+		class: "menu-non-iconic"
+	})
+	rightContext.elem(m, 'menupopup', {onpopupshowing: "rightContext.fillSearchSubmenu(this)"})
 
-			return croppedText;
-		}
+	var s = document.getElementById("context-sep-open")
 
-		proto.createSearchItem = function(){
-			var old = document.getElementById("context-searchselect")
-			if(old){
-				nsContextMenu.prototype.oldNode = old
-				nsContextMenu.prototype.oldNodePosId = old.nextSibling && old.nextSibling.id
-				old.parentNode.removeChild(old)
-			}
+	var c = document.getElementById("contentAreaContextMenu")
+	c.insertBefore(m, s)
+	return m
+}
+rightContext.getSelectedText = function() {
+	var selectedText = getBrowserSelection();
 
-			var m = document.createElement('menu')
-			m.setAttribute('id', "ifox-context-searchselect")
-			m.setAttribute('type', "splitmenu")
-			m.setAttribute('onclick', "gContextMenu&&gContextMenu.doSearch(event)")
-			m.setAttribute('oncommand', "gContextMenu&&gContextMenu.doSearch(event)")
-			m.setAttribute('class', "menu-non-iconic")
+	if (selectedText)
+		return selectedText
+	try{
+		var editor = content.document.activeElement
+			.QueryInterface(Ci.nsIDOMNSEditableElement).editor
+	}catch(e){
+		try{
+			var editor = document.popupNode
+				.QueryInterface(Ci.nsIDOMNSEditableElement).editor
+		}catch(e){}
+	}
+	try{
+		return editor.selection.toString()
+	}catch(e){}
+	return ''
+}
+rightContext.fillSearchSubmenu = function(popup) {
+	var menu
+	while(menu = popup.firstChild)
+		popup.removeChild(menu)
+	Services.search.getVisibleEngines().forEach(function(engine){
+		rightContext.elem(popup, 'menuitem', {
+			name: engine.name,
+			label: engine.name,
+			image: engine.iconURI.spec,
+			class: "menuitem-iconic"
+		})				
+	})
+}
+rightContext.doSearch = function(e) {
+	var name = e.target.getAttribute('name')
+	if(!name)
+		return
+	var selectedText = this.getSelectedText()
+	
+	var engine = Services.search.getEngineByName(name);
+	var submission = engine.getSubmission(selectedText);
+	if (!submission) {
+		return;
+	}
+	var href = submission.uri.spec
+	var postData = submission.postData
+	
+	this.openLinkIn(href, e, postData);
+}
+rightContext.openLinkIn = function(href, e, postData, fixup){			
+	var where = e.target.getAttribute('where') || "tab"
+	if(e.button == 1)
+		where = "tabshifted"
+	else if(e.button == 2)
+		where = "current"
+	if(e.ctrlKey || e.altKey){
+		if(where == 'tab')
+			where = 'tabshifted'
+		else if(where == 'tabshifted')
+			where = 'tab';
+	}else if(e.shiftKey && where != 'current')
+		where = 'current';
+	
+	openLinkIn(href, where, fixup||{postData: postData, relatedToCurrent: true});
+}
+rightContext.linkClick = function(e){
+	var doc = gContextMenu.target.ownerDocument;
+	this.openLinkIn(rightContext.linkURL, e, null, {
+			charset: doc.characterSet,
+			referrerURI: doc.documentURIObject
+	})
+}
 
-			var p = document.createElement('menupopup')
-			p.setAttribute('onpopupshowing', "gContextMenu.fillSearchSubmenu(this)")
-
-			m.appendChild(p)
-
-			var s = document.getElementById("context-sep-open")
-
-			var c = document.getElementById("contentAreaContextMenu")
-			c.insertBefore(m, s)
-			return m
-		}
-		proto.getSelectedText = function() {
-			var selectedText = getBrowserSelection();
-
-			if (selectedText)
-				return selectedText
-			try{
-				var editor = content.document.activeElement
-					.QueryInterface(Ci.nsIDOMNSEditableElement).editor
-			}catch(e){
-				try{
-					var editor = document.popupNode
-						.QueryInterface(Ci.nsIDOMNSEditableElement).editor
-				}catch(e){}
-			}
-			try{
-				return editor.selection.toString()
-			}catch(e){}
-			return ''
-		}
-		proto.fillSearchSubmenu = function(popup) {
-			var menu
-			while(menu = popup.firstChild)
-				popup.removeChild(menu)
-			Services.search.getVisibleEngines().forEach(function(engine){
-				menu = document.createElement('menuitem')
-				menu.setAttribute('name', engine.name)
-				menu.setAttribute('label', engine.name)
-				menu.setAttribute('image', engine.iconURI.spec)
-				menu.setAttribute('class', "menuitem-iconic")		
-				popup.appendChild(menu)
-			})
-		}
-		proto.doSearch = function(e) {
-			var name = e.target.getAttribute('name')
-			if(!name)
-				return
-			var selectedText = this.getSelectedText()
-			
-			var engine = Services.search.getEngineByName(name);
-			var submission = engine.getSubmission(selectedText);
-			if (!submission) {
-				return;
-			}
-			var href = submission.uri.spec
-			var postData = submission.postData
-			
-			this.openLinkIn(href, e, postData);
-		}
-		proto.openLinkIn = function(href, e, postData, fixup){			
-			var where = e.target.getAttribute('where') || "tab"
-			if(e.button == 1)
-				where = "tabshifted"
-			else if(e.button == 2)
-				where = "current"
-			if(e.ctrlKey || e.altKey){
-				if(where == 'tab')
-					where = 'tabshifted'
-				else if(where == 'tabshifted')
-					where = 'tab';
-			}else if(e.shiftKey && where != 'current')
-				where = 'current';
-			
-			openLinkIn(href, where, fixup||{postData: postData, relatedToCurrent: true});
-		}
-		proto.linkClick = function(e){
-			var doc = this.target.ownerDocument;
-			this.openLinkIn(this.linkURL, e, null, {
-					charset: doc.characterSet,
-					referrerURI: doc.documentURIObject
-			})
-		}
-
-proto.initOpenItems_orig = proto.initOpenItems_orig || proto.initOpenItems 
-proto.initOpenItems = function() {
+/*** called with this = gContextMenu **/
+rightContext.initOpenItems = function() {
     var item = document.getElementById("context-openlinkintab")
 	if(!item)
 		return;
@@ -335,18 +324,13 @@ proto.initOpenItems = function() {
     // Time to do some bad things and see if we've highlighted a URL that
     // isn't actually linked.
     var onPlainTextLink = false
-	dump(
-		this.onLink,
-		nsContextMenu.isMouseOver(document.popupNode),
-		nsContextMenu.isMouseOverSelection(),
-		nsContextMenu.getPlainLinkText()
-	)
+	
 	var linkText = this.isTextSelected;
-	if(linkText && !nsContextMenu.isMouseOverSelection()){
+	if(linkText && !rightContext.isMouseOverSelection()){
 		linkText = ""
 	}
 	if (!linkText && !this.onLink) {
-		linkText = nsContextMenu.getPlainLinkText() || this.isTextSelected
+		linkText = rightContext.getPlainLinkText() || this.isTextSelected
 	}
 	
 	if (linkText) {
@@ -377,7 +361,7 @@ proto.initOpenItems = function() {
 	if (shouldShow)
 		item.linkText = this.linkURL
 }
-nsContextMenu.getPlainLinkText = function(){
+rightContext.getPlainLinkText = function(){
 	var linkText = ""
 	var text = document.popupRangeParent.textContent
 	var l = document.popupRangeOffset
@@ -408,13 +392,13 @@ nsContextMenu.getPlainLinkText = function(){
 
 	return linkText.replace(/[\)\]\}\>\.;,]*$/, '')
 }
-nsContextMenu.isMouseOver = function(item){
+rightContext.isMouseOver = function(item){
 	var rect = item.getBoundingClientRect()
 	var x = this.lastEvent.x, y = this.lastEvent.y
 	if(x < rect.right && x > rect.left && y < rect.bottom && y > rect.top)
 		return true
 }
-nsContextMenu.isMouseOverSelection = function(){
+rightContext.isMouseOverSelection = function(){
 	try{
 		var pn = document.popupNode
 		if(pn instanceof Ci.nsIDOMNSEditableElement){
@@ -427,24 +411,27 @@ nsContextMenu.isMouseOverSelection = function(){
 		return true
 	}
 }
-gBrowser.addEventListener("mouseup", nsContextMenu.saveMousePos = function(e){
-    nsContextMenu.lastEvent={x:e.clientX,y:e.clientY,b:e.button,time: e.timeStamp}
-}, false)
+rightContext.saveMousePos = function(e){
+    rightContext.lastEvent={x:e.clientX,y:e.clientY,b:e.button,time: e.timeStamp}
+}
+
+ 
+rightContext.modifyContextMenu = function(enable){
+	let proto = nsContextMenu.prototype
+	if (enable && !this.isTextSelection_orig){
+		this.isTextSelection_orig = proto.isTextSelection;
+		this.initOpenItems_orig = proto.initOpenItems;
+		
+		proto.isTextSelection = this.isTextSelection
+		proto.initOpenItems = this.initOpenItems
+
+		gBrowser.addEventListener("mouseup", this.saveMousePos, false)
 	}
-	else if(!enable && proto.isTextSelection_orig){
-		proto.isTextSelection = proto.isTextSelection_orig
+	else if(!enable && this.isTextSelection_orig){
+		proto.isTextSelection = this.isTextSelection_orig
+		proto.initOpenItems = this.initOpenItems_orig;
 		
-		gBrowser.removeEventListener("mouseup", nsContextMenu.saveMousePos, false)
-		delete nsContextMenu.getPlainLinkText
-		delete nsContextMenu.isMouseOver
-		delete nsContextMenu.isMouseOverSelection
-		
-		delete proto.isTextSelection_orig 
-		delete proto.createSearchItem 
-		delete proto.getSelectedText 
-		delete proto.fillSearchSubmenu 
-		delete proto.doSearch 
-		delete proto.openLinkIn 
+		gBrowser.removeEventListener("mouseup", rightContext.saveMousePos, false)
 		let popup = document.getElementById("contentAreaContextMenu")
 		let node = document.getElementById("ifox-context-searchselect")
 		node && node.parentNode.removeChild(node)
@@ -452,7 +439,8 @@ gBrowser.addEventListener("mouseup", nsContextMenu.saveMousePos = function(e){
 	}
 
 }
-modifyContextMenu()
+rightContext.modifyContextMenu(true)
+
 
 // disable haveSetDesktopBackground
 nsContextMenu.prototype.initViewItems = function() {
@@ -490,6 +478,8 @@ nsContextMenu.prototype.initViewItems = function() {
 
     this.showItem("context-viewimageinfo", this.onImage);
 }
+
+
 
 /***************************************************************************
  *   status 4 evar

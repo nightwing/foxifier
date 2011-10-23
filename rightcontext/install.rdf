@@ -2,12 +2,12 @@
 <r:RDF xmlns="http://www.mozilla.org/2004/em-rdf#"
        xmlns:r="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <r:Description about="urn:mozilla:install-manifest">
-    <description>adds a context menu to stop/reload for more fine grained control over page loading</description>
+    <description>fixes contexmenu annoyances: plaintext link + better search + undoCloseTab + duplicateTab</description>
     <creator>someone</creator>
     <homepageURL>http://foximirror.blogspot.com/</homepageURL>
-    <id>absolute@load.control.am</id>
-    <name>absolute load control</name>
-    <version>0.15</version>
+    <id>right@context.a.am</id>
+    <name>right context</name>
+    <version>0.01</version>
 
     <bootstrap>true</bootstrap>
     <type>2</type>

@@ -16,7 +16,7 @@
 	  <menu id="context-openlinkintab" type='splitmenu' label="Open Link in New Tab" 
 				onmouseover="window.XULBrowserWindow.setOverLink(this.linkText, null);"
 				onmouseout="window.XULBrowserWindow.setOverLink('', null);"
-				onclick="gContextMenu.linkClick(event);" insertbefore='context-sep-open'>
+				onclick="rightContext.linkClick(event);" insertbefore='context-sep-open'>
 			<menupopup>
 				<menuitem label="in current tab" where='current'/>			
 				<menuitem label="in foreground tab" where='tabshifted'/>			
