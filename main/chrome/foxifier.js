@@ -45,9 +45,96 @@ toOpenWindowByURI=function(uri){
     window.open(uri, "_blank", "chrome,extrachrome,menubar,resizable,scrollbars,status,toolbar");
 
 }
+$ = function(x)document.getElementById(x)
+$.XML = function(element, xml, childBefore){
+	var range = element.ownerDocument.createRange()
+	range.selectNode(element)
+	range.collapse(true)
+	var fragment = range.createContextualFragment(xml)
 
+	return element.insertBefore(fragment, childBefore)
+}
+$.elem = function(parent, name, props, before, children){
+	if(typeof parent=="string"){
+		children = before
+		before = props
+		props = name
+		name = parent
+		parent = null
+	}
+	if(typeof before == 'number')
+		before = parent.children[before]
+	else if(before && Array.isArray(before)){
+		children = before
+		before = null
+	}
+
+	var el = document.createElement(name)
+	for(var prop in props){
+		el.setAttribute(prop, props[prop])
+	}
+	if(parent)
+		parent.insertBefore(el, before)
+	return el
+}
+$.remove = function(el){
+	if(typeof el == "string")
+		el = $(el)
+	el && el.parentNode.removeChild(el)
+	return el
+}
 // undo close tab
-function PHMM_populateUndoSubmenu(popup) {
+rightContext = {}
+rightContext.duplicate = function(){
+	var tab = gBrowser.mContextTab||gBrowser.mCurrentTab;
+	var newTab = Cc['@mozilla.org/browser/sessionstore;1'].getService(Ci.nsISessionStore).duplicateTab(window, tab, 0);
+	gBrowser.moveTabTo(newTab, tab._tPos)
+}
+
+dump(1)
+
+rightContext.undoCloseTab = function(e){
+	var item = e.target;
+	if(item.undoCount){
+		while(item.undoCount--)
+			undoCloseTab()
+	}else{
+		undoCloseTab(item.value)
+	}	
+	if(e.button == 1){
+		gBrowser.moveTabToEnd()
+		item.parentNode.closePopup()
+	}
+}
+rightContext.createTabContextMenu = function() {
+	var tabContextMenu = $("tabContextMenu")
+	var oldEl = $.remove('context_undoCloseTab')
+	var oldEl = $.remove('context_reloadTab')
+	
+	$.remove('context_duplicate')
+	
+	var menu = $.elem(tabContextMenu, 'menu',{
+		id: "context_undoCloseTab",
+		label: "Undo Close Tab",
+		type: "splitmenu",
+		closemenu: "none",
+		accesskey: "U",
+		observes: "History:UndoCloseTab"
+	}, 0)
+	$.elem(menu, 'menupopup', {
+		oncommand: "event.stopPropagation();rightContext.undoCloseTab(event)",
+		onclick: "event.stopPropagation();rightContext.undoCloseTab(event)",
+		onpopupshowing: "rightContext.populateUndoSubmenu(this)"
+	})
+	$.elem(tabContextMenu, 'menuitem', {
+		id: "context_duplicate",
+		label: "Duplicate",
+		accesskey: "D",
+		oncommand:"rightContext.duplicate()"
+	}, 1)
+}
+rightContext.createTabContextMenu()
+rightContext.populateUndoSubmenu = function(popup) {
 	var _ss = Cc["@mozilla.org/browser/sessionstore;1"].getService(Ci.nsISessionStore)
     var undoMenu = popup.parentNode;
     var undoPopup = popup;
@@ -71,17 +158,14 @@ function PHMM_populateUndoSubmenu(popup) {
             m.setAttribute("image", iconURL);
         }
         m.setAttribute("class", "menuitem-iconic bookmark-item menuitem-with-favicon");
-        m.setAttribute("value", i);
-        //m.setAttribute("closemenu", "none");
+        m.value = i;
         let tabData = undoItems[i].state;
         let activeIndex = (tabData.index || tabData.entries.length) - 1;
         if (activeIndex >= 0 && tabData.entries[activeIndex]) {
             m.setAttribute("targetURI", tabData.entries[activeIndex].url);
         }
-        //m.addEventListener("click", this._undoCloseMiddleClick, false);
-        if (i == 0) {
+        if (i == 0)
             m.setAttribute("key", "key_undoCloseTab");
-        }
         undoPopup.appendChild(m);
     }
     var strings = gNavigatorBundle;
@@ -89,7 +173,7 @@ function PHMM_populateUndoSubmenu(popup) {
     m = undoPopup.appendChild(document.createElement("menuitem"));
     m.id = "menu_restoreAllTabs";
     m.setAttribute("label", strings.getString("menuRestoreAllTabs.label"));
-    m.addEventListener("command", function () {for (var i = 0; i < undoItems.length; i++) {undoCloseTab();}}, false);
+    m.undoCount = undoItems.length
 }
 
 /*********************************************************************************

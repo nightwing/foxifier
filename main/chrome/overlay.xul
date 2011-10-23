@@ -1,28 +1,7 @@
 <?xml version="1.0"?>
 
 <overlay id="tab_history_overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">	
-	<script type="application/x-javascript" src="foxifier.js"></script>
-	
-	<menupopup id="tabContextMenu">
-	  <menuitem id="context_duplicate" insertbefore="context_reloadTab" label="Duplicate" accesskey="D" oncommand="
-		var tab=gBrowser.mContextTab||gBrowser.mCurrentTab;
-		var newTab = Cc['@mozilla.org/browser/sessionstore;1'].getService(Ci.nsISessionStore).duplicateTab(window, tab, 0);
-			gBrowser.moveTabTo(newTab,tab._tPos)"
-	  />
-	  <menuitem id="context_undoCloseTab" removeelement="true"/>
-	  <menu id="context_undoCloseTab" type='splitmenu' label="Undo Close Tab"  closemenu="none" accesskey="U" observes="History:UndoCloseTab" 
-		position="1">
-			<menupopup oncommand="event.stopPropagation();undoCloseTab(parseInt(event.target.getAttribute('value')));"
-			onpopupshowing="PHMM_populateUndoSubmenu.call(document.getElementById('history-menu')._placesView,this)"/>
-	  </menu>
-	  <menuitem id="context_duplicate" insertbefore="context_reloadTab" label="Duplicate" accesskey="D" oncommand="
-		var tab=gBrowser.mContextTab||gBrowser.mCurrentTab;
-		var newTab = Cc['@mozilla.org/browser/sessionstore;1'].getService(Ci.nsISessionStore).duplicateTab(window, tab, 0);
-			gBrowser.moveTabTo(newTab,tab._tPos);/*gBrowser.removeTab(tab, {animate: false, byMouse: false})*/"
-	  />
-	</menupopup>
-	
-	
+	<script type="application/x-javascript" src="chrome://foxifier/content/foxifier.js"></script>
 	
 <menupopup id="contentAreaContextMenu"
 	   onpopupshowing="if (event.target != this)
