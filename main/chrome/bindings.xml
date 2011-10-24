@@ -4,7 +4,7 @@
     xmlns:xbl="http://www.mozilla.org/xbl"
     xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-<binding id="splitmenu" extends="chrome://global/content/bindings/menu.xml#menuitem-base">
+   <binding id="splitmenu" extends="chrome://global/content/bindings/menu.xml#menuitem-base">
     <content align='stretch'>
 		<xul:hbox anonid="item" flex="1" allowevents='true'>
 			<xul:menuitem anonid="menuitem" flex="1"
@@ -30,7 +30,11 @@
       <field name="menu" readonly="true">
             document.getAnonymousElementByAttribute(this, "anonid", "menu");
       </field>
-      
+      <property name="isMenuitemActive">
+        <getter><![CDATA[            
+            return this.menuitem.hasAttribute("_moz-menuactive")&&this.menuitem.getAttribute("_moz-menuactive")=="true"
+        ]]></getter>
+      </property>
       
     </implementation>
 	<handlers>
@@ -62,10 +66,10 @@
         if(this.item.style.pointerEvents=="none")
             this.menuitem.setAttribute("_moz-menuactive", true)
       ]]></handler>
-	  <handler event="click"><![CDATA[        	
-			event.button != 1 && this.parentNode.hidePopup();
+	  <handler event="click" phase="target"><![CDATA[        	
+			event.button != 1 && this.isMenuitemActive && this.parentNode.hidePopup();	
       ]]></handler>
-	</handlers>
-</binding>
+	  </handlers>
+  </binding>
 
 </bindings>

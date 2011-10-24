@@ -30,6 +30,12 @@ rightContext.remove = function(el){
 	el && el.parentNode.removeChild(el)
 	return el
 }
+rightContext.showItem = function(id, show){
+	let node = this.$(id)
+	if(!id)
+		return
+	node.style.display = show?"":"none"
+}
 
 rightContext.duplicate = function(){
 	var tab = gBrowser.mContextTab||gBrowser.mCurrentTab;
@@ -42,7 +48,8 @@ dump(1)
 rightContext.undoCloseTab = function(e){
 	var item = e.target;
 	if(item.undoCount){
-		while(item.undoCount--)
+		var count = item.undoCount
+		while(count--)
 			undoCloseTab()
 	}else{
 		undoCloseTab(item.value)
@@ -53,29 +60,29 @@ rightContext.undoCloseTab = function(e){
 	}
 }
 rightContext.modifyTabContextMenu = function(enable) {
-	var tabContextMenu = rightContext.$("tabContextMenu")
-	var oldEl = rightContext.remove('context_undoCloseTab')
-	var oldEl = rightContext.remove('context_reloadTab')
+	if(!enable){
+		this.showItem('context_reloadTab', true)
+		this.remove('right-context_undoCloseTab')
+		this.remove('right-context_duplicate')
+		return
+	}
+	this.showItem('context_reloadTab', false)
 	
-	rightContext.remove('context_duplicate')
+	var tabContextMenu = rightContext.$("tabContextMenu")	
 	
 	var menu = rightContext.elem(tabContextMenu, 'menu',{
-		id: "context_undoCloseTab",
-		label: "Undo Close Tab",
-		type: "splitmenu",
-		closemenu: "none",
-		accesskey: "U",
-		observes: "History:UndoCloseTab"
+		id: "right-context_undoCloseTab", label: "Undo Close Tab",
+		type: "splitmenu", closemenu: "none", accesskey: "U",
+		observes: "History:UndoCloseTab",
+		onclick: "dump(event.target==this,this.isMenuitemActive);if(event.target==this&&this.isMenuitemActive)rightContext.undoCloseTab(event)"
 	}, 0)
 	rightContext.elem(menu, 'menupopup', {
 		oncommand: "event.stopPropagation();rightContext.undoCloseTab(event)",
-		onclick: "event.stopPropagation();rightContext.undoCloseTab(event)",
+		onclick: "event.stopPropagation();",
 		onpopupshowing: "rightContext.populateUndoSubmenu(this)"
 	})
 	rightContext.elem(tabContextMenu, 'menuitem', {
-		id: "context_duplicate",
-		label: "Duplicate",
-		accesskey: "D",
+		id: "context_duplicate", label: "Duplicate", accesskey: "D",
 		oncommand:"rightContext.duplicate()"
 	}, 1)
 }
@@ -127,7 +134,7 @@ rightContext.populateUndoSubmenu = function(popup) {
  **/
 /*** called with this = gContextMenu **/
 rightContext.isTextSelection = function() {
-	var splitMenu = document.getElementById("ifox-context-searchselect") || rightContext.createSearchItem()
+	var splitMenu = document.getElementById("right-context-searchselect") || rightContext.createSearchItem()
 	var menuitem = splitMenu.menuitem
 
 	var selectedText = rightContext.getSelectedText(), croppedText = selectedText
@@ -159,15 +166,10 @@ rightContext.isTextSelection = function() {
 	return croppedText;
 }
 rightContext.createSearchItem = function(){
-	var old = this.$("context-searchselect")
-	if(old){
-		nsContextMenu.prototype.oldNode = old
-		nsContextMenu.prototype.oldNodePosId = old.nextSibling && old.nextSibling.id
-		old.parentNode.removeChild(old)
-	}
-
+	this.showItem("context-searchselect", false)
+		
 	var m = rightContext.elem('menu', {
-		id: "ifox-context-searchselect",
+		id: "right-context-searchselect",
 		type: "splitmenu",
 		onclick: "gContextMenu&&rightContext.doSearch(event)",
 		oncommand: "gContextMenu&&rightContext.doSearch(event)",
@@ -182,9 +184,9 @@ rightContext.createSearchItem = function(){
 	return m
 }
 rightContext.createOpenItem = function(){
-	nsContextMenu.prototype.showItem("context-openlinkincurrent", false)
-	nsContextMenu.prototype.showItem("context-openlinkintab", false)
-	nsContextMenu.prototype.showItem("context-openlink", false)
+	this.showItem("context-openlinkincurrent", false)
+	this.showItem("context-openlinkintab", false)
+	this.showItem("context-openlink", false)
 
 	var m = this.elem('menu', {
 		id: "right-context-openlinkintab",
@@ -202,7 +204,7 @@ rightContext.createOpenItem = function(){
 	this.elem(p, "menuitem", {label: "in foreground tab", where: 'tabshifted'})
 	this.elem(p, "menuitem", {label: "in new window", where: 'window'})
 
-	var s = this.$("ifox-context-searchselect") || this.$("context-sep-open")
+	var s = this.$("right-context-searchselect") || this.$("ifox-context-searchselect") || this.$("context-sep-open")
 
 	var c = this.$("contentAreaContextMenu")
 	c.insertBefore(m, s)
@@ -241,6 +243,8 @@ rightContext.fillSearchSubmenu = function(popup) {
 	})
 }
 rightContext.doSearch = function(e) {
+	if(e.target.menuitem && !e.target.isMenuitemActive)
+		return;
 	var name = e.target.getAttribute('name')
 	if(!name)
 		return
@@ -273,7 +277,8 @@ rightContext.openLinkIn = function(href, e, postData, fixup){
 	openLinkIn(href, where, fixup||{postData: postData, relatedToCurrent: true});
 }
 rightContext.linkClick = function(e){
-dump(4)
+	if(e.target.menuitem && !e.target.isMenuitemActive)
+		return;
 	var doc = gContextMenu.target.ownerDocument;
 	this.openLinkIn(gContextMenu.linkURL, e, null, {
 			charset: doc.characterSet,
@@ -406,29 +411,28 @@ rightContext.modifyContextMenu = function(enable){
 	ifox || this.hook(proto, 'isTextSelection',  enable)
 	this.hook(proto, 'initOpenItems',  enable)
 	
-	if (enable && !this.isTextSelection_orig){
+	if (enable){
 		gBrowser.addEventListener("mouseup", this.saveMousePos, false)
-	}else if(!enable && this.wasEnabled){
+	}else{
 		gBrowser.removeEventListener("mouseup", rightContext.saveMousePos, false)
-		let popup = this.$("contentAreaContextMenu")
-		let node = this.$("ifox-context-searchselect")
-		node && node.parentNode.removeChild(node)
-		popup.insertBefore(proto.oldNode, proto.oldNodePosId && this.$(proto.oldNodePosId))
-		
+				
+		this.remove("right-context-searchselect")
 		this.remove("right-context-openlinkintab")
+		
+		this.showItem("context-searchselect", true)
+		this.showItem("context-openlinkincurrent", true)
+		this.showItem("context-openlinkintab", true)
+		this.showItem("context-openlink", true)		
 	}
 }
 
 
 rightContext.init = function(enable) {
 	if (enable) {
-		if (!("InstantFox" in window)){
-			//this.pi=document.createProcessingInstruction("xml-stylesheet", 'href="chrome://rightContext/content/overlay.css"')            
-            //document.appendChild(this.pi)
-			var s = document.createElementNS('http://www.w3.org/1999/xhtml', "style")
-        	s.setAttribute("href", "chrome://rightContext/content/overlay.css")
-    		s.setAttribute("type", "text/css")
-			s.innerHTML=
+		var s = document.createElementNS('http://www.w3.org/1999/xhtml', "style")
+        s.setAttribute("href", "chrome://rightContext/content/overlay.css")
+    	s.setAttribute("type", "text/css")
+		s.innerHTML=
 'menuitem.split-menuitem-item[_moz-menuactive="true"], .split-menu-right-image[_moz-menuactive="true"] {/*for xp*/\
     background-color: -moz-menuhover;\
     color: -moz-menuhovertext;\
@@ -444,17 +448,15 @@ menuitem.split-menuitem-item{\
     -moz-box-pack: end;\
 }\
 menu[type=splitmenu] {\
-    -moz-binding: url("chrome://rightContext/content/bindings.xml#splitmenu")!important;\
+    -moz-binding: url("chrome://rightContext/content/bindings.xml?v1#splitmenu")!important;\
     -moz-box-orient: horizontal;\
     -moz-appearance: none !important;\
     color: menutext;\
     background-color: transparent !important;\
 }'
             
-            document.documentElement.appendChild(s)
-		}
+        document.documentElement.appendChild(s)
 	}else{
-		this.remove(this.pi)
 		var s = document.querySelector('style[src^="chrome://rightContext/content/"]')
 		this.remove(s)
 		var s = document.querySelector('script[src^="chrome://rightContext/content/"]')

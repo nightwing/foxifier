@@ -11,6 +11,9 @@
 
     <bootstrap>true</bootstrap>
     <type>2</type>
+	
+    <optionsURL>chrome://rightContext/content/options.xul</optionsURL>
+
 
     <targetApplication>
       <r:Description>

@@ -1,0 +1,616 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<!--devel__( -->
+<?xml-stylesheet href="chrome://shadia/content/css/global.css" type="text/css"?>
+<!--devel__) -->
+
+<window xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+	xmlns:html="http://www.w3.org/1999/xhtml"
+	xmlns:svg='http://www.w3.org/2000/svg'
+	title="right context options"
+	width="450" height="600"
+	resizable='yes' onunload='savePrefs()'>
+<script>
+Components.utils.import("resource://gre/modules/Services.jsm");
+try{
+	if(window.opener &amp;&amp; window.opener.location.href=='about:addons'){
+		Services.ww.openWindow(null, window.location, "_blank", 'dialog=no,centerscreen,resizable', null)
+		savePrefs = function(){}
+		setTimeout(window.close, 20)
+	}
+}catch(e){
+	Components.utils.reportError(e)
+}
+</script>
+
+<svg:svg height="0">
+    <svg:filter id="gray">
+      <svg:feColorMatrix values="0.3333 0.3333 0.3333 0 0
+                                 0.3333 0.3333 0.3333 0 0
+                                 0.3333 0.3333 0.3333 0 0
+                                 0      0      0      1 0"/>
+    </svg:filter>
+</svg:svg>
+
+<html:style>
+.link {
+	color:blue;
+	cursor:pointer;
+}
+.link:hover {
+	text-decoration:underline;
+}
+.link.help {
+	text-shadow: 2px 2px 6px #FFF,  -2px -2px 6px #FFF, 0pt 0px 6px #FFF;
+}
+richlistbox {
+	overflow-y:auto;
+	min-height:5ch;
+	width:35ch;
+}
+richlistitem:nth-child(odd) {
+	background-color: #FBFBFB;
+}
+richlistitem[selected="true"] {
+	background-color: #EEF9FF;
+	color:#0500A0
+}
+/* ======================/*\======/*\====================== */
+textbox:not(.normal){
+	-moz-appearance: none;
+	border: none;
+	background: #EEF9FF;
+	color: #556;
+	width: 5ch;
+	box-shadow: 0pt 0pt 1.5px 1px gray;
+}
+textbox.key{
+	padding: 1px 1px 2px 1px;
+	border: none;
+	text-align: center;
+}
+.longbox{
+	width: 50ch;
+}
+textbox:not(.normal)[focused='true']{
+	color:-moz-fieldtext;
+	background:-moz-field;
+	box-shadow: 0pt 0pt 1.5px 1px gray, 0pt 0pt 2.5px 1px yellow;
+}
+textbox[conflict=true], label[conflict=true]{
+	color: darkred!important;
+	text-shadow: -1px -1px 2px #FFFFFF, 0pt -1px 6px red;
+}
+textbox[conflict=maybe]{
+	color:darkred!important;
+	text-shadow: 0pt -1px 3px gold;
+}
+/* ======================/*\======/*\====================== */
+richlistitem[disabled="true"]>label, hbox[disabled="true"]>label{
+	color: graytext;
+	text-decoration: line-through;
+}
+richlistitem[disabled="true"]>hbox>image{
+	filter: url("#gray");
+}
+richlistitem[selected="true"]>hbox>textbox{
+	background: white;
+}
+richlistitem:hover{
+	text-shadow: -1px -1px 2px #FFFFFF, 0pt -1px 6px gold;
+}
+richlistbox[seltype="multiple"]:focus > richlistitem[current="true"]{
+	outline: 0px solid highlight!important;
+	outline-offset: -2px!important;
+}
+splitter {
+	-moz-appearance: none;
+}
+/* close button */
+resetbutton {
+	-moz-appearance: none;
+	-moz-image-region: rect(0, 16px, 16px, 0px);
+
+	border: none;	margin: 0px;	padding: 0px;
+	-moz-margin-start: -4px;
+	-moz-margin-end: 4px;
+
+	border-radius: 4px;
+	background: #EEF9FF;
+	box-shadow: 0pt 0pt 1.5px 1px gray;
+
+	list-style-image: url("chrome://instantfox/content/skin/search-close.png");
+	-moz-binding: url("chrome://global/content/bindings/toolbarbutton.xml#toolbarbutton");
+
+	width:16px;
+	height:16px;
+}
+
+resetbutton:hover {
+	-moz-image-region: rect(0, 32px, 16px, 16px);
+}
+
+resetbutton:hover:active {
+	-moz-image-region: rect(0, 32px, 16px, 16px);
+}
+
+slickbutton {
+	-moz-binding: url("chrome://global/content/bindings/toolbarbutton.xml#toolbarbutton");
+	background: -moz-linear-gradient(#F3F3ED, #CECEC3);
+	color: #000000;
+	box-shadow: 0 0 2px #CECEC3;
+	border: solid 1px #ACA899;
+	-moz-border-radius: 8px;
+	padding:1px 4px;
+	margin:4px;
+	cursor:pointer;
+}
+slickbutton .toolbarbutton-icon{
+	display: none;
+}
+slickbutton.attention{
+	background: -moz-linear-gradient(#a3F3FD, #aEFEC3);
+}
+slickbutton:hover {
+	background: -moz-linear-gradient(#F3F3ED, #DEDED3);
+}
+slickbutton:hover:active {
+	background: -moz-linear-gradient(#ACA899, #FFFFFF);
+}
+
+label[control='opacity-scale']{
+	margin-top: 10px!important;
+	margin-bottom: -3px!important;
+}
+
+#add {
+	background: -moz-linear-gradient(#91BD09, #749A02);
+	color: #FFFFFF;
+}
+#add:hover {
+	background: -moz-linear-gradient(#749A02, #91BD09);
+}
+#add:hover:active {
+	background: -moz-linear-gradient(#749A02, #91BD09);
+}
+
+
+#highlight {
+	font-weight:bold;
+	font-size: 14px;
+}
+#standard-shortcuts,#user-shortcuts{
+	text-align:center;
+}
+.separator{
+	font-size:80%;
+	color: graytext;
+	-moz-border-bottom-colors:threedshadow threedhighlight;
+	-moz-border-top-colors: threedshadow;
+	border-bottom: 2px solid ;
+	border-top: 1px solid ;
+	margin:0px;
+}
+.image{
+	width:16px
+}
+.shiftTop{
+	margin-top:-5px;
+	margin-bottom:5px;
+}
+#instantLoad{
+	-moz-appearance:none;
+}
+#instantLoad[checked]{
+	text-shadow: -1px -1px 3px gold, 0pt -1px 3px gold;
+}
+checkbox:-moz-focusring > .checkbox-label-box{
+	border: 1px dotted transparent;
+}
+
+.plugin-status{
+	width: 16px;
+	height: 16px;
+	cursor: help;
+	-moz-transition-duration: 0.7s;
+	-moz-transition-property: opacity,background;
+	opacity:1;
+}
+.plugin-status[status="instant"]{
+	background:url(chrome://instantfox/content/skin/instant.png)
+}
+.plugin-status[status="not-instant"]{
+	opacity:0;
+	pointer-events: none;	
+}
+.plugin-status[status="invalid"]{
+	background:url(chrome://instantfox/content/skin/invalid.png)
+}
+
+dropmarker[type="button"]{
+	-moz-appearance: toolbarbutton;
+} 
+.animate{	
+	-moz-transition-duration: 0.8s;
+	-moz-transition-property: opacity, text-shadow;
+}
+.invisible{
+	opacity:0;
+	pointer-events: none;
+}
+row{
+	-moz-box-align: center;
+}
+
+
+slidecheckbox{
+	-moz-box-align:center
+}
+slidecheck {
+	display: block;	
+	background: -moz-linear-gradient(19% 75% 90deg,#3095C7, #14539C); 
+	border-radius: 4px;
+	border: 1px solid #555555;
+	width: 5em;
+	position: relative;
+	cursor:pointer;
+	text-shadow: #093B5C 0px -1px 1px;
+	color: #fff;
+	text-align: center
+}
+slidecheck::before {
+	content: "ON";
+	width: 50%;display: inline-block;	
+}
+slidecheck::after {
+	content: "OFF";
+	width: 50%;
+	right:0;display: inline-block;	
+}
+slidecheck>check { 
+	display: block;
+	width: 48%;
+	height: 98%;
+	border-radius: 3px;
+	background: -moz-linear-gradient(19% 75% 90deg,#FAFAFA, #A1A1A1);
+	box-shadow: 0 0 1.5px #e5e5e5 inset;
+	position: absolute;
+	top: 1%;
+	left: 1%;
+	-moz-transition-duration: 0.1s;
+	-moz-transition-property: left,right,width;
+	pointer-events:none
+}
+slidecheckbox:hover>slidecheck>check{
+	background: -moz-linear-gradient(19% 75% 90deg,#FFF, #B1B1B1);	
+	box-shadow: 0 0 1.5px #FFF;
+}
+.checked>slidecheck >check {
+	left: 50%
+}
+
+.accessKey{
+	color:graytext;
+	font-style:italic
+}
+</html:style>
+
+<tabbox flex='1'>
+	<tabpanels  flex='1'>
+		<tabpanel orient='vertical'  flex='1'>
+			<richlistbox id='shortcuts' flex='1' onkeypress='rbKeyPress(event, this)'
+				seltype='multiple' context='context' onselect='rbSelect(event, this)' onmouseup='rbMouseup(event, this)'/>
+		</tabpanel>
+	</tabpanels>
+</tabbox>
+
+<hbox>
+	<!-- devel__( -->
+		<shadiaglue id='status-bar'/>
+	<!-- devel__) -->
+	<spacer flex='1'/>
+	<slickbutton label='cancel' oncommand='resultOK=false;close()'/>
+	<slickbutton label='ok' oncommand='resultOK=true;close()'/>
+</hbox>
+
+
+
+<menupopup id="context" onpopupshowing='initContextMenu(this)' oncommand='onContextMenuCommand(event)'>
+	<menuitem label='instant' type='checkbox' aID='disableInstant'/>
+	<menuitem label='suggest' type='checkbox' aID='disableSuggest'/>
+	<menuitem label='show on context' type='checkbox' aID='hideFromContextMenu'/>
+	<menuseparator/>
+	<menuitem label='enabled' type='checkbox' aID='disabled'/>
+	<menuitem label='edit' aID='edit'/>
+</menupopup>
+
+
+<script type="application/x-javascript;v=1.8" ><![CDATA[            
+var Cc = Components.classes
+var Ci = Components.interfaces
+
+Components.utils.import("resource://gre/modules/Services.jsm");
+
+//************* dom utils
+function $(id){
+    return document.getElementById(id)
+}
+function $t(el, aID) {
+	return el && el.getElementsByAttribute('aID', aID)[0]
+}
+function $parent(el){
+	while(el){
+		if(el.id)
+			return el
+		el=el.parentNode
+	}
+}
+
+function clean(el){
+	var ch
+	while(ch=el.lastChild)
+		el.removeChild(ch)
+}
+function appendXML(element, xml){
+	var range = document.createRange()
+	range.selectNode(element)
+	range.collapse(true)
+	var fragment = range.createContextualFragment(xml)
+
+	return element.appendChild(fragment)
+}
+function replaceXML(element, xml){
+	var range = document.createRange()
+	range.selectNode(element)
+	var fragment = range.createContextualFragment(xml)
+
+	return element.parentNode.replaceChild(fragment, element)
+}
+function formatString(string, options){
+	return string.replace(/\$[^\$]*\$/g, function(x){
+		var x = x.slice(1,-1)
+		if(x[0]=='!')
+			return options[x.substr(1)]?'false':'true'
+		if(x[0]=='_'){
+			x = x.substr(1)
+			var strName = options[x]
+			return escapeHTML(i18n[x+"_"+strName]||"")
+		}
+		if(typeof options[x]!='string')
+			return options[x]?options[x].toString():''
+		return escapeHTML(options[x]||'')
+	})
+}
+function escapeHTML(str) str.replace(/[&"<>]/g, function(m)"&"+escapeMap[m]+";");
+var escapeMap = { "&": "amp", '"': "quot", "<": "lt", ">": "gt" }
+
+toggleVisibility = function(el, selector, on){
+	var list = el.querySelectorAll(selector)
+	var actionName = on?"remove":on==null?"toggle":"add"
+	for(var i = list.length; i--; ){
+		list[i].classList[actionName]("invisible") 
+	}
+}
+
+//************************ context menu
+initContextMenu = function(popup){
+	var item = document.popupNode
+	item = $parent(item)
+	var selectedItems = $('shortcuts').selectedItems
+
+	for each(var aID in ['disableInstant', 'disableSuggest', 'hideFromContextMenu', 'disabled'])
+		$t(popup, aID).setAttribute(
+			'checked',
+			!selectedItems.some(function(x){
+				var p = InstantFoxModule.Plugins[x.id]
+				return !p || p[aID]
+			})
+		)
+		
+	var editItem = $t(popup, 'edit')
+	var visible = selectedItems.length == 1 && !InstantFoxModule.Plugins[selectedItems[0].id].disabled
+	editItem.hidden = !visible
+}
+onContextMenuCommand = function(e){
+	var menu = e.target
+	var name = menu.getAttribute('aID')
+	var item = document.popupNode
+	item = $parent(item)
+	if (name=='edit'){
+		openEditPopup(item.lastElementChild)
+		return
+	}
+
+	var rbox = $("shortcuts")
+	var selectedItems = rbox.selectedItems
+	var value = menu.getAttribute('checked')!='true'
+
+	var ids = []
+
+	selectedItems.forEach(function(x){
+		ids.push(x.id)
+		InstantFoxModule.Plugins[x.id][name] = value
+	})
+
+	rebuild()
+
+	//restore selection
+	ids.forEach(function(x){
+		rbox.addItemToSelection($(x));
+	})
+
+
+}
+
+//************************ edit popup utils
+var gPlugin, gPluginsChanged, gPrefChanged, resultOK = true;
+
+
+
+
+//*************************
+
+onTextboxInput = function(el){
+	var id = $parent(el).id
+	var orig = InstantFoxModule.Plugins[id].key
+	InstantFoxModule.Plugins[id].key = el.value
+
+	ibp.pluginLoader.initShortcuts()
+	markConflicts()
+	InstantFoxModule.Plugins[id].key = orig
+}
+onTextboxEnter = function(el){
+	var id = $parent(el).id
+	InstantFoxModule.Plugins[id].key = el.value
+	ibp.pluginLoader.initShortcuts()
+	markConflicts()
+
+	gPluginsChanged = true
+}
+onTextboxEscape = function(el){
+	var id = $parent(el).id
+	el.value = InstantFoxModule.Plugins[id][el.className]
+	el.blur()
+}
+
+rbSelect=function(e, rbox){
+}
+rbKeyPress = function(e, rbox){
+	var c
+	var el = e.target
+
+	if(e.ctrlKey && e.charCode==102){
+		$("pluginFilter").focus()
+		return
+	}
+	if(el.className == 'key'){
+		if(e.keyCode==27){
+			onTextboxEscape(el)
+		}
+		if(e.keyCode==13){
+			el.blur()
+			$parent(el).parentNode.focus()
+		}
+		if(e.keyCode==40||e.keyCode==38){
+			$t($parent(el).parentNode.selectedItem,'key').focus()
+		}
+		rbox.selectionInKeyTextbox = true
+		return
+	}
+	if($t(rbox.selectedItem,'key')){
+		rbox.selectionInKeyTextbox = false	
+	}
+	if(e.keyCode==13){
+		openEditPopup(rbox.selectedItem)
+	}
+}
+rbMouseup = function(e, rbox){
+	rbox.selectionInKeyTextbox = false;
+	//**********
+	var item = e.target;
+	var aID = item.getAttribute('aID')
+	//**********
+	if (aID == 'visible') {
+		var item = $parent(e.target)
+		item.id
+		var visible = item.querySelector("checkbox").checked
+		item.setAttribute("disabled", visible)
+
+		
+		return
+	}
+	if (!aID && item.className == 'separator'){
+		var start = item.nextSibling, end = item = start
+
+		while((item = item.nextSibling) && ( item.nodeName == 'richlistitem')  ){
+			end = item
+		}
+		if(start && end && start.className != 'separator')
+			start.parentNode.selectItemRange(start, end)
+		else
+			start.parentNode.clearSelection()
+	}
+}
+
+//*************
+function savePrefs(){
+	if(gPrefChanged){
+		var panes = document.getElementsByTagName('prefpane')
+		for (var i=panes.length;i--;)
+			panes[i].writePreferences(false)
+	}
+
+	var em = Services.wm.getEnumerator('navigator:browser')
+	while(em.hasMoreElements())
+		em.getNext().InstantFox.updateUserStyle()
+
+	if(!gPluginsChanged)
+		return
+	if(resultOK)
+		InstantFoxModule.pluginLoader.savePlugins()
+	else
+		InstantFoxModule.pluginLoader.loadPlugins()
+	gPluginsChanged = false
+}
+//*************
+xmlFragment =
+	  <richlistitem align="center" id='$id$' disabled="$!visible$">
+		<hbox align="center" class='image'>
+			<image src="$image$" width="16" height="16"/>
+		</hbox>
+		<label value="$label$"/>
+		<label value="$accessKey$" class="accessKey"/>
+		<spacer flex="1"/>
+		<checkbox aID="visible" checked="$visible$"/>
+	  </richlistitem>.toXMLString().replace(/>\s*</g,'><')
+sepFragment =
+	<hbox align="center" id='$id$' class='separator' disabled="$!visible$">
+	  <label  value='   $id$' style="pointer-events:none"/>
+	  <spacer flex="1"/>
+	  <checkbox aID="visible" checked="$visible$"/>
+	</hbox>.toXMLString().replace(/>\s*</g,'><')
+	 
+function menu2XML(p){
+	return formatString(p.name == "menuseparator" ? sepFragment : xmlFragment, p)
+}
+
+rebuild = function(){
+	var xml=[];
+	
+	var doc = Services.wm.getMostRecentWindow("navigator:browser").document
+	var nodes = doc.getElementById("contentAreaContextMenu").children
+	for(var i=0;i<nodes.length;i++){
+		var el = nodes[i]
+		var p={
+			id: el.id,
+			label: el.label||el.id,
+			name: el.localName,
+			image: el.image,
+			accessKey: el.accessKey
+		}
+		dump(p.name)
+		p.visible = !!(i%2)
+		xml.push(menu2XML(p))
+	}
+	var el = $("shortcuts");
+	//it's important to clear selection of richbox before removing its' children
+	el.clearSelection()
+
+	clean(el)
+	appendXML(el, xml.join(''))
+}
+
+
+window.addEventListener("DOMContentLoaded", function() {
+	window.removeEventListener("DOMContentLoaded", arguments.callee, false)
+	
+	rebuild()
+}, false)
+
+
+
+
+]]></script>
+
+
+</window>
