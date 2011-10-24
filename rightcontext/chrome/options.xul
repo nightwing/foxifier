@@ -102,6 +102,35 @@ slickbutton:hover:active {
 	background: -moz-linear-gradient(#ACA899, #FFFFFF);
 }
 
+/* close button */
+resetbutton {
+	-moz-appearance: none;
+	-moz-image-region: rect(0, 16px, 16px, 0px);
+
+	border: none;	margin: 0px;	padding: 0px;
+	-moz-margin-start: -4px;
+	-moz-margin-end: 4px;
+
+	border-radius: 4px;
+	background: #EEF9FF;
+	box-shadow: 0pt 0pt 1.5px 1px gray;
+
+	list-style-image: url("chrome://global/skin/icons/Search-close.png");
+	-moz-binding: url("chrome://global/content/bindings/toolbarbutton.xml#toolbarbutton");
+
+	width:16px;
+	height:16px;
+}
+
+resetbutton:hover {
+	-moz-image-region: rect(0, 32px, 16px, 16px);
+}
+
+resetbutton:hover:active {
+	-moz-image-region: rect(0, 32px, 16px, 16px);
+}
+
+
 .separator{
 	color:green;
 	font-style:italic;
@@ -149,6 +178,11 @@ row{
 <tabbox flex='1'>
 	<tabpanels  flex='1'>
 		<tabpanel orient='vertical'  flex='1'>
+			<hbox align='center'>
+				<textbox placeholder="Search Plugins" flex='1' class='normal' width='0' id='pluginFilter'
+					oninput="rebuild();this.nextSibling.hidden = !this.value;"/>
+				<resetbutton hidden='true' onclick='var t = this.previousSibling;t.value="";t.oninput()' />
+			</hbox>
 			<richlistbox id='shortcuts' flex='1' onkeypress='rbKeyPress(event, this)'
 				seltype='multiple' context='context' onselect='rbSelect(event, this)' onmouseup='rbMouseup(event, this)'/>
 		</tabpanel>
@@ -354,7 +388,7 @@ rbMouseup = function(e, rbox){
 function savePrefs(){
 	var list = []
 	for (var x in gHiddenItems)
-		if(x!="undefined" && x!="no-id")
+		if(x!="undefined" && x!="no-id" && gHiddenItems[x])
 			list.push(x)
 	core.pref.save(list)
 	core.WindowListener.forEach(function(){rightContext.initStyles()})
@@ -388,6 +422,9 @@ rebuild = function(){
 	
 	var doc = win.document;
 	var nodes = doc.getElementById("contentAreaContextMenu").children
+	
+	var pluginFilter = $("pluginFilter").value	
+	
 	for(var i=0;i<nodes.length;i++){
 		var el = nodes[i]
 		var p={
@@ -399,8 +436,8 @@ rebuild = function(){
 		p.label = (el.label || p.id);
 
 		p.visible = !gHiddenItems[p.id]
-dump(p.id, p.visible, gHiddenItems[p.id])
-		xml.push(menu2XML(p))
+		if(p.label.indexOf(pluginFilter)!=-1)
+			xml.push(menu2XML(p))
 	}
 	var el = $("shortcuts");
 	//it's important to clear selection of richbox before removing its' children
