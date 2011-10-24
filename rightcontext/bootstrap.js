@@ -1,9 +1,32 @@
 /** use this code in console to access global for this file
 
 var XPIProviderBP = Components.utils.import("resource://gre/modules/XPIProvider.jsm")
-XPIProviderBP.XPIProvider.bootstrapScopes["instant@maps.de"]
+XPIProviderBP.XPIProvider.bootstrapScopes["right@context.a.am"]
 
 /******************************************************************/
+
+pref = {
+	name: "extensions.rightContext.itemlist",
+	defVal: '#openlink,#openlinkincurrent,#openlinkintab,#searchselect',
+	
+	get: function(){
+		if (Services.prefs.prefHasUserValue(this.name))
+			var pref=Services.prefs.getCharPref(this.name)
+		else
+			var pref=this.defVal
+		return pref.replace('#', "context-", "g")
+	},
+	save: function(idList){
+	
+		idList = idList.sort()		
+		var str = idList.join(",").replace('context-', "#", "g")
+		if(str != this.defVal)
+			Services.prefs.setCharPref(this.name, str)
+		else
+			Services.prefs.clearUserPref(this.name);
+	}
+}
+
 
 var Cc = Components.classes;
 var Ci = Components.interfaces;
@@ -40,8 +63,18 @@ WindowListener={
 		}, false);
 	},
 	onCloseWindow: function(aWindow){ },
-	onWindowTitleChange: function(aWindow, aTitle){ }
+	onWindowTitleChange: function(aWindow, aTitle){ },
+	forEach: function(func){
+		let enumerator = Services.wm.getEnumerator("navigator:browser");
+		while(enumerator.hasMoreElements()) {
+			let win = enumerator.getNext();
+			try{func(win)}catch(e){Components.utils.reportError(e)}
+		}		
+	}
 }
+
+
+
 
 /**************************************************************************
  * bootstrap.js API
@@ -49,11 +82,7 @@ WindowListener={
 function startup(aData, aReason) {
 	AddManifestLocation(aData.installPath)
 	// Load into any existing windows
-	let enumerator = Services.wm.getEnumerator("navigator:browser");
-	while(enumerator.hasMoreElements()) {
-		let win = enumerator.getNext();
-		loadIntoWindow(win);
-	}
+	WindowListener.forEach(loadIntoWindow)	
 	// Load into all new windows
 	Services.wm.addListener(WindowListener);
 }

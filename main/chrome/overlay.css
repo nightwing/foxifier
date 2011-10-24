@@ -1,26 +1,3 @@
-/************************************************************************************************/
-/* splitmenu */
-menuitem.split-menuitem-item[_moz-menuactive="true"], .split-menu-right-image[_moz-menuactive="true"] {/*for xp*/
-    background-color: -moz-menuhover;
-    color: -moz-menuhovertext;
-}
-menuitem.split-menuitem-item{
-    padding: 0!important;/*for mac*/
-    pointer-events:none;
-    -moz-margin-end:1px;/*for xp*/
-}
-.split-menu-right-image {
-   /* padding: 0!important;for mac*/
-    -moz-appearance: menuitem;
-    -moz-box-pack: end;
-}
-menu[type=splitmenu] {
-    -moz-binding: url("chrome://foxifier/content/bindings.xml#splitmenu")!important;
-    -moz-box-orient: horizontal;
-    -moz-appearance: none !important;
-    color: menutext;
-    background-color: transparent !important;
-}
 /***/
 #appmenu-button {
   background-image: -moz-linear-gradient(rgb(247,182,82), rgb(215,98,10) 95%);

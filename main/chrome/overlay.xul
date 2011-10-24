@@ -12,17 +12,7 @@
 					   return gContextMenu.shouldDisplay;"
 	   onpopuphiding="if (event.target == this) { gContextMenu = null; updateEditUIVisibility(); }">
 
-      <menuitem id="context-openlinkintab" removeelement="true"/>
-	  <menu id="context-openlinkintab" type='splitmenu' label="Open Link in New Tab" 
-				onmouseover="window.XULBrowserWindow.setOverLink(this.linkText, null);"
-				onmouseout="window.XULBrowserWindow.setOverLink('', null);"
-				onclick="rightContext.linkClick(event);" insertbefore='context-sep-open'>
-			<menupopup>
-				<menuitem label="in current tab" where='current'/>			
-				<menuitem label="in foreground tab" where='tabshifted'/>			
-				<menuitem label="in new window" where='window'/>
-			</menupopup>
-	  </menu>	  
+      <menuitem id="context-openlinkintab" removeelement="true"/>	   
       <menuitem id="context-openlinkincurrent" removeelement="true"/>
       <menuitem id="context-openlink" removeelement="true"/>
       <menuseparator id="context-sep-open"/>

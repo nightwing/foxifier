@@ -11,7 +11,7 @@
 	width="450" height="600"
 	resizable='yes' onunload='savePrefs()'>
 <script>
-Components.utils.import("resource://gre/modules/Services.jsm");
+/*Components.utils.import("resource://gre/modules/Services.jsm");
 try{
 	if(window.opener &amp;&amp; window.opener.location.href=='about:addons'){
 		Services.ww.openWindow(null, window.location, "_blank", 'dialog=no,centerscreen,resizable', null)
@@ -20,7 +20,7 @@ try{
 	}
 }catch(e){
 	Components.utils.reportError(e)
-}
+}*/
 </script>
 
 <svg:svg height="0">
@@ -56,46 +56,16 @@ richlistitem[selected="true"] {
 	color:#0500A0
 }
 /* ======================/*\======/*\====================== */
-textbox:not(.normal){
-	-moz-appearance: none;
-	border: none;
-	background: #EEF9FF;
-	color: #556;
-	width: 5ch;
-	box-shadow: 0pt 0pt 1.5px 1px gray;
-}
-textbox.key{
-	padding: 1px 1px 2px 1px;
-	border: none;
-	text-align: center;
-}
-.longbox{
-	width: 50ch;
-}
-textbox:not(.normal)[focused='true']{
-	color:-moz-fieldtext;
-	background:-moz-field;
-	box-shadow: 0pt 0pt 1.5px 1px gray, 0pt 0pt 2.5px 1px yellow;
-}
-textbox[conflict=true], label[conflict=true]{
-	color: darkred!important;
-	text-shadow: -1px -1px 2px #FFFFFF, 0pt -1px 6px red;
-}
-textbox[conflict=maybe]{
-	color:darkred!important;
-	text-shadow: 0pt -1px 3px gold;
-}
+
 /* ======================/*\======/*\====================== */
-richlistitem[disabled="true"]>label, hbox[disabled="true"]>label{
+richlistitem[disabled="true"], hbox[disabled="true"]{
 	color: graytext;
 	text-decoration: line-through;
 }
 richlistitem[disabled="true"]>hbox>image{
 	filter: url("#gray");
 }
-richlistitem[selected="true"]>hbox>textbox{
-	background: white;
-}
+
 richlistitem:hover{
 	text-shadow: -1px -1px 2px #FFFFFF, 0pt -1px 6px gold;
 }
@@ -106,33 +76,7 @@ richlistbox[seltype="multiple"]:focus > richlistitem[current="true"]{
 splitter {
 	-moz-appearance: none;
 }
-/* close button */
-resetbutton {
-	-moz-appearance: none;
-	-moz-image-region: rect(0, 16px, 16px, 0px);
 
-	border: none;	margin: 0px;	padding: 0px;
-	-moz-margin-start: -4px;
-	-moz-margin-end: 4px;
-
-	border-radius: 4px;
-	background: #EEF9FF;
-	box-shadow: 0pt 0pt 1.5px 1px gray;
-
-	list-style-image: url("chrome://instantfox/content/skin/search-close.png");
-	-moz-binding: url("chrome://global/content/bindings/toolbarbutton.xml#toolbarbutton");
-
-	width:16px;
-	height:16px;
-}
-
-resetbutton:hover {
-	-moz-image-region: rect(0, 32px, 16px, 16px);
-}
-
-resetbutton:hover:active {
-	-moz-image-region: rect(0, 32px, 16px, 16px);
-}
 
 slickbutton {
 	-moz-binding: url("chrome://global/content/bindings/toolbarbutton.xml#toolbarbutton");
@@ -158,33 +102,9 @@ slickbutton:hover:active {
 	background: -moz-linear-gradient(#ACA899, #FFFFFF);
 }
 
-label[control='opacity-scale']{
-	margin-top: 10px!important;
-	margin-bottom: -3px!important;
-}
-
-#add {
-	background: -moz-linear-gradient(#91BD09, #749A02);
-	color: #FFFFFF;
-}
-#add:hover {
-	background: -moz-linear-gradient(#749A02, #91BD09);
-}
-#add:hover:active {
-	background: -moz-linear-gradient(#749A02, #91BD09);
-}
-
-
-#highlight {
-	font-weight:bold;
-	font-size: 14px;
-}
-#standard-shortcuts,#user-shortcuts{
-	text-align:center;
-}
 .separator{
-	font-size:80%;
-	color: graytext;
+	color:green;
+	font-style:italic;
 	-moz-border-bottom-colors:threedshadow threedhighlight;
 	-moz-border-top-colors: threedshadow;
 	border-bottom: 2px solid ;
@@ -208,29 +128,11 @@ checkbox:-moz-focusring > .checkbox-label-box{
 	border: 1px dotted transparent;
 }
 
-.plugin-status{
-	width: 16px;
-	height: 16px;
-	cursor: help;
-	-moz-transition-duration: 0.7s;
-	-moz-transition-property: opacity,background;
-	opacity:1;
-}
-.plugin-status[status="instant"]{
-	background:url(chrome://instantfox/content/skin/instant.png)
-}
-.plugin-status[status="not-instant"]{
-	opacity:0;
-	pointer-events: none;	
-}
-.plugin-status[status="invalid"]{
-	background:url(chrome://instantfox/content/skin/invalid.png)
-}
 
 dropmarker[type="button"]{
 	-moz-appearance: toolbarbutton;
-} 
-.animate{	
+}
+.animate{
 	-moz-transition-duration: 0.8s;
 	-moz-transition-property: opacity, text-shadow;
 }
@@ -242,57 +144,6 @@ row{
 	-moz-box-align: center;
 }
 
-
-slidecheckbox{
-	-moz-box-align:center
-}
-slidecheck {
-	display: block;	
-	background: -moz-linear-gradient(19% 75% 90deg,#3095C7, #14539C); 
-	border-radius: 4px;
-	border: 1px solid #555555;
-	width: 5em;
-	position: relative;
-	cursor:pointer;
-	text-shadow: #093B5C 0px -1px 1px;
-	color: #fff;
-	text-align: center
-}
-slidecheck::before {
-	content: "ON";
-	width: 50%;display: inline-block;	
-}
-slidecheck::after {
-	content: "OFF";
-	width: 50%;
-	right:0;display: inline-block;	
-}
-slidecheck>check { 
-	display: block;
-	width: 48%;
-	height: 98%;
-	border-radius: 3px;
-	background: -moz-linear-gradient(19% 75% 90deg,#FAFAFA, #A1A1A1);
-	box-shadow: 0 0 1.5px #e5e5e5 inset;
-	position: absolute;
-	top: 1%;
-	left: 1%;
-	-moz-transition-duration: 0.1s;
-	-moz-transition-property: left,right,width;
-	pointer-events:none
-}
-slidecheckbox:hover>slidecheck>check{
-	background: -moz-linear-gradient(19% 75% 90deg,#FFF, #B1B1B1);	
-	box-shadow: 0 0 1.5px #FFF;
-}
-.checked>slidecheck >check {
-	left: 50%
-}
-
-.accessKey{
-	color:graytext;
-	font-style:italic
-}
 </html:style>
 
 <tabbox flex='1'>
@@ -316,20 +167,19 @@ slidecheckbox:hover>slidecheck>check{
 
 
 <menupopup id="context" onpopupshowing='initContextMenu(this)' oncommand='onContextMenuCommand(event)'>
-	<menuitem label='instant' type='checkbox' aID='disableInstant'/>
-	<menuitem label='suggest' type='checkbox' aID='disableSuggest'/>
-	<menuitem label='show on context' type='checkbox' aID='hideFromContextMenu'/>
+	<menuitem label='enabled' type='checkbox' aID='visible'/>
 	<menuseparator/>
-	<menuitem label='enabled' type='checkbox' aID='disabled'/>
-	<menuitem label='edit' aID='edit'/>
+	<menuitem label='reset' aID='visible'/>
 </menupopup>
 
 
-<script type="application/x-javascript;v=1.8" ><![CDATA[            
+<script type="application/x-javascript;v=1.8" ><![CDATA[
 var Cc = Components.classes
 var Ci = Components.interfaces
 
 Components.utils.import("resource://gre/modules/Services.jsm");
+
+var core = Components.utils.import("resource://gre/modules/XPIProvider.jsm").XPIProvider.bootstrapScopes["right@context.a.am"]
 
 //************* dom utils
 function $(id){
@@ -388,7 +238,7 @@ toggleVisibility = function(el, selector, on){
 	var list = el.querySelectorAll(selector)
 	var actionName = on?"remove":on==null?"toggle":"add"
 	for(var i = list.length; i--; ){
-		list[i].classList[actionName]("invisible") 
+		list[i].classList[actionName]("invisible")
 	}
 }
 
@@ -406,7 +256,7 @@ initContextMenu = function(popup){
 				return !p || p[aID]
 			})
 		)
-		
+
 	var editItem = $t(popup, 'edit')
 	var visible = selectedItems.length == 1 && !InstantFoxModule.Plugins[selectedItems[0].id].disabled
 	editItem.hidden = !visible
@@ -443,35 +293,12 @@ onContextMenuCommand = function(e){
 }
 
 //************************ edit popup utils
-var gPlugin, gPluginsChanged, gPrefChanged, resultOK = true;
+var gHiddenItems = {}, resultOK = true;
 
 
 
 
 //*************************
-
-onTextboxInput = function(el){
-	var id = $parent(el).id
-	var orig = InstantFoxModule.Plugins[id].key
-	InstantFoxModule.Plugins[id].key = el.value
-
-	ibp.pluginLoader.initShortcuts()
-	markConflicts()
-	InstantFoxModule.Plugins[id].key = orig
-}
-onTextboxEnter = function(el){
-	var id = $parent(el).id
-	InstantFoxModule.Plugins[id].key = el.value
-	ibp.pluginLoader.initShortcuts()
-	markConflicts()
-
-	gPluginsChanged = true
-}
-onTextboxEscape = function(el){
-	var id = $parent(el).id
-	el.value = InstantFoxModule.Plugins[id][el.className]
-	el.blur()
-}
 
 rbSelect=function(e, rbox){
 }
@@ -498,7 +325,7 @@ rbKeyPress = function(e, rbox){
 		return
 	}
 	if($t(rbox.selectedItem,'key')){
-		rbox.selectionInKeyTextbox = false	
+		rbox.selectionInKeyTextbox = false
 	}
 	if(e.keyCode==13){
 		openEditPopup(rbox.selectedItem)
@@ -510,15 +337,6 @@ rbMouseup = function(e, rbox){
 	var item = e.target;
 	var aID = item.getAttribute('aID')
 	//**********
-	if (aID == 'visible') {
-		var item = $parent(e.target)
-		item.id
-		var visible = item.querySelector("checkbox").checked
-		item.setAttribute("disabled", visible)
-
-		
-		return
-	}
 	if (!aID && item.className == 'separator'){
 		var start = item.nextSibling, end = item = start
 
@@ -534,23 +352,18 @@ rbMouseup = function(e, rbox){
 
 //*************
 function savePrefs(){
-	if(gPrefChanged){
-		var panes = document.getElementsByTagName('prefpane')
-		for (var i=panes.length;i--;)
-			panes[i].writePreferences(false)
-	}
-
-	var em = Services.wm.getEnumerator('navigator:browser')
-	while(em.hasMoreElements())
-		em.getNext().InstantFox.updateUserStyle()
-
-	if(!gPluginsChanged)
-		return
-	if(resultOK)
-		InstantFoxModule.pluginLoader.savePlugins()
-	else
-		InstantFoxModule.pluginLoader.loadPlugins()
-	gPluginsChanged = false
+	var list = []
+	for (var x in gHiddenItems)
+		if(x!="undefined" && x!="no-id")
+			list.push(x)
+	core.pref.save(list)
+	core.WindowListener.forEach(function(){rightContext.initStyles()})
+}
+onCommand = function(el){
+	var item = $parent(el)		
+	var visible = el.checked
+	item.setAttribute("disabled", !visible)
+	gHiddenItems[item.id] = !visible
 }
 //*************
 xmlFragment =
@@ -558,38 +371,35 @@ xmlFragment =
 		<hbox align="center" class='image'>
 			<image src="$image$" width="16" height="16"/>
 		</hbox>
-		<label value="$label$"/>
-		<label value="$accessKey$" class="accessKey"/>
-		<spacer flex="1"/>
-		<checkbox aID="visible" checked="$visible$"/>
+		<checkbox aID="visible" checked="$visible$" label="$label$" oncommand="onCommand(this)"/>
 	  </richlistitem>.toXMLString().replace(/>\s*</g,'><')
 sepFragment =
 	<hbox align="center" id='$id$' class='separator' disabled="$!visible$">
-	  <label  value='   $id$' style="pointer-events:none"/>
-	  <spacer flex="1"/>
-	  <checkbox aID="visible" checked="$visible$"/>
+	  <checkbox aID="visible" checked="$visible$" label="$label$" oncommand="onCommand(this)"/>
 	</hbox>.toXMLString().replace(/>\s*</g,'><')
-	 
+
 function menu2XML(p){
 	return formatString(p.name == "menuseparator" ? sepFragment : xmlFragment, p)
 }
 
 rebuild = function(){
 	var xml=[];
+	var win=Services.wm.getMostRecentWindow("navigator:browser")
 	
-	var doc = Services.wm.getMostRecentWindow("navigator:browser").document
+	var doc = win.document;
 	var nodes = doc.getElementById("contentAreaContextMenu").children
 	for(var i=0;i<nodes.length;i++){
 		var el = nodes[i]
 		var p={
-			id: el.id,
-			label: el.label||el.id,
 			name: el.localName,
 			image: el.image,
 			accessKey: el.accessKey
 		}
-		dump(p.name)
-		p.visible = !!(i%2)
+		p.id = el.id || "no-id";
+		p.label = (el.label || p.id);
+
+		p.visible = !gHiddenItems[p.id]
+dump(p.id, p.visible, gHiddenItems[p.id])
 		xml.push(menu2XML(p))
 	}
 	var el = $("shortcuts");
@@ -604,6 +414,7 @@ rebuild = function(){
 window.addEventListener("DOMContentLoaded", function() {
 	window.removeEventListener("DOMContentLoaded", arguments.callee, false)
 	
+	core.pref.get().split(',').forEach(function(x)gHiddenItems[x] = true)	
 	rebuild()
 }, false)
 

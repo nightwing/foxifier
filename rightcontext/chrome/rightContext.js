@@ -32,7 +32,7 @@ rightContext.remove = function(el){
 }
 rightContext.showItem = function(id, show){
 	let node = this.$(id)
-	if(!id)
+	if(!node)
 		return
 	node.style.display = show?"":"none"
 }
@@ -166,7 +166,7 @@ rightContext.isTextSelection = function() {
 	return croppedText;
 }
 rightContext.createSearchItem = function(){
-	this.showItem("context-searchselect", false)
+	//this.showItem("context-searchselect", false)
 		
 	var m = rightContext.elem('menu', {
 		id: "right-context-searchselect",
@@ -184,9 +184,9 @@ rightContext.createSearchItem = function(){
 	return m
 }
 rightContext.createOpenItem = function(){
-	this.showItem("context-openlinkincurrent", false)
-	this.showItem("context-openlinkintab", false)
-	this.showItem("context-openlink", false)
+	// this.showItem("context-openlinkincurrent", false)
+	// this.showItem("context-openlinkintab", false)
+	// this.showItem("context-openlink", false)
 
 	var m = this.elem('menu', {
 		id: "right-context-openlinkintab",
@@ -419,20 +419,17 @@ rightContext.modifyContextMenu = function(enable){
 		this.remove("right-context-searchselect")
 		this.remove("right-context-openlinkintab")
 		
-		this.showItem("context-searchselect", true)
-		this.showItem("context-openlinkincurrent", true)
-		this.showItem("context-openlinkintab", true)
-		this.showItem("context-openlink", true)		
+		// this.showItem("context-searchselect", true)
+		// this.showItem("context-openlinkincurrent", true)
+		// this.showItem("context-openlinkintab", true)
+		// this.showItem("context-openlink", true)		
 	}
 }
+rightContext.initStyles = function(){	
+	var pref = Cu.import("resource://gre/modules/XPIProvider.jsm").XPIProvider.bootstrapScopes["right@context.a.am"].pref.get()
 
-
-rightContext.init = function(enable) {
-	if (enable) {
-		var s = document.createElementNS('http://www.w3.org/1999/xhtml', "style")
-        s.setAttribute("href", "chrome://rightContext/content/overlay.css")
-    	s.setAttribute("type", "text/css")
-		s.innerHTML=
+	var hideCss = "#" + pref.replace(',', ",#", "g") + '{display:none}'
+	this.styleSheet.innerHTML=
 'menuitem.split-menuitem-item[_moz-menuactive="true"], .split-menu-right-image[_moz-menuactive="true"] {/*for xp*/\
     background-color: -moz-menuhover;\
     color: -moz-menuhovertext;\
@@ -453,9 +450,17 @@ menu[type=splitmenu] {\
     -moz-appearance: none !important;\
     color: menutext;\
     background-color: transparent !important;\
-}'
-            
+}'  + hideCss
+}
+
+rightContext.init = function(enable) {
+	if (enable) {	
+		var s = document.createElementNS('http://www.w3.org/1999/xhtml', "style")		
+        s.setAttribute("href", "chrome://rightContext/content/overlay.css")
+    	s.setAttribute("type", "text/css")
+		this.styleSheet = s		           
         document.documentElement.appendChild(s)
+		this.initStyles()
 	}else{
 		var s = document.querySelector('style[src^="chrome://rightContext/content/"]')
 		this.remove(s)
