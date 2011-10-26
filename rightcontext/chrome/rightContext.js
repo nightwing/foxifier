@@ -163,7 +163,7 @@ rightContext.isTextSelection = function() {
 		splitMenu.hidden = false
 	}
 
-	return croppedText;
+	return selectedText;
 }
 rightContext.createSearchItem = function(){
 	//this.showItem("context-searchselect", false)
@@ -245,6 +245,9 @@ rightContext.fillSearchSubmenu = function(popup) {
 rightContext.doSearch = function(e) {
 	if(e.target.menuitem && !e.target.isMenuitemActive)
 		return;
+	if(e.button != 1)
+		gContextMenu = null
+
 	var name = e.target.getAttribute('name')
 	if(!name)
 		return
@@ -279,11 +282,15 @@ rightContext.openLinkIn = function(href, e, postData, fixup){
 rightContext.linkClick = function(e){
 	if(e.target.menuitem && !e.target.isMenuitemActive)
 		return;
+
 	var doc = gContextMenu.target.ownerDocument;
 	this.openLinkIn(gContextMenu.linkURL, e, null, {
 			charset: doc.characterSet,
 			referrerURI: doc.documentURIObject
 	})
+	
+	if(e.button != 1)
+		gContextMenu = null
 }
 
 /*** called with this = gContextMenu **/
@@ -333,6 +340,7 @@ rightContext.initOpenItems = function() {
 		}
 	}
 
+	dump(this.linkURL,linkText)
     var shouldShow = this.onSaveableLink || isMailtoInternal || onPlainTextLink;
 	this.showItem("context-sep-open", shouldShow || this.isTextSelected);
 	item.hidden = !shouldShow
