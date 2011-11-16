@@ -184,7 +184,8 @@ row{
 				<resetbutton hidden='true' onclick='var t = this.previousSibling;t.value="";t.oninput()' />
 			</hbox>
 			<richlistbox id='shortcuts' flex='1' onkeypress='rbKeyPress(event, this)'
-				seltype='multiple' context='context' onselect='rbSelect(event, this)' onmouseup='rbMouseup(event, this)'/>
+				seltype='multiple' context='context' onselect='rbSelect(event, this)' 
+				onmouseup='rbMouseup(event, this)' oncommand="schedule(savePrefs)"/>
 		</tabpanel>
 	</tabpanels>
 </tabbox>
@@ -194,7 +195,7 @@ row{
 		<shadiaglue id='status-bar'/>
 	<!-- devel__) -->
 	<spacer flex='1'/>
-	<slickbutton label='cancel' oncommand='resultOK=false;close()'/>
+	<!-- <slickbutton label='cancel' oncommand='resultOK=false;close()'/> -->
 	<slickbutton label='ok' oncommand='resultOK=true;close()'/>
 </hbox>
 
@@ -385,13 +386,20 @@ rbMouseup = function(e, rbox){
 }
 
 //*************
+
+function schedule(func, delay){
+	if (func.timer != null)
+		clearTimeout(func.timer)
+	func.timer = setTimeout(func, delay||400)
+}
+
 function savePrefs(){
 	var list = []
 	for (var x in gHiddenItems)
 		if(x!="undefined" && x!="no-id" && gHiddenItems[x])
 			list.push(x)
 	core.pref.save(list)
-	core.WindowListener.forEach(function(){rightContext.initStyles()})
+	core.WindowListener.forEach(function(win){win.rightContext.initStyles()})
 }
 onCommand = function(el){
 	var item = $parent(el)		
@@ -423,7 +431,7 @@ rebuild = function(){
 	var doc = win.document;
 	var nodes = doc.getElementById("contentAreaContextMenu").children
 	
-	var pluginFilter = $("pluginFilter").value	
+	var pluginFilter = $("pluginFilter").value.toLowerCase()	
 	
 	for(var i=0;i<nodes.length;i++){
 		var el = nodes[i]
@@ -436,7 +444,7 @@ rebuild = function(){
 		p.label = (el.label || p.id);
 
 		p.visible = !gHiddenItems[p.id]
-		if(p.label.indexOf(pluginFilter)!=-1)
+		if(p.label.toLowerCase().indexOf(pluginFilter)!=-1)
 			xml.push(menu2XML(p))
 	}
 	var el = $("shortcuts");
