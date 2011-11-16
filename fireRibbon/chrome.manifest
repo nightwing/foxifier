@@ -1,0 +1,10 @@
+content  fireRibbon  chrome/content/
+skin     fireRibbon  classic/1.0  chrome/skin/
+locale   fireRibbon  en-US  chrome/locale/en-US/
+
+overlay  chrome://browser/content/browser.xul  chrome://fireRibbon/content/overlay.xul
+style    chrome://global/content/customizeToolbar.xul chrome://fireRibbon/skin/style.css
+
+style chrome://browser/content/browser.xul chrome://fireRibbon/content/overlay.css
+
+

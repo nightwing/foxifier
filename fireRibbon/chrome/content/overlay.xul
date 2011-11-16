@@ -1,0 +1,121 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin" type="text/css"?>
+<?xml-stylesheet href="chrome://fireRibbon/skin/style.css" type="text/css"?>
+
+<!DOCTYPE overlay [
+  <!ENTITY % identityDTD SYSTEM "chrome://fireRibbon/locale/hc.dtd"> %identityDTD;
+  <!ENTITY % browserDTD  SYSTEM "chrome://browser/locale/browser.dtd"> %browserDTD;
+]>
+
+<overlay id="fireRibbon" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+	<window id="main-window">
+
+    <script src="chrome://fireRibbon/content/fireRibbon.js"/>
+  
+  
+    <toolbox id="navigator-toolbox" class="toolbox-top" mode="icons"
+           defaultmode="icons">
+		   
+	
+		  <toolbarpalette id="BrowserToolbarPalette">
+			<toolbarbutton id="ff-menu-button" orient="vertical" noarrow="true"
+			  label="&hidemenu.label;" hidelabel="true" class="toolbarbutton-1"
+			  onclick="fireRibbon.MenuBtnClick(event, 0);"
+			  ondblclick="fireRibbon.MenuBtnClick(event, 1);"
+			  onmouseover="fireRibbon.MenuBtnOver(event);"
+			  context=""
+			  >
+			  <menupopup id="ff-btn-menu" tooltiptext="" context=""
+				onpopuphidden ="fireRibbon.TinyMenuEvent(event, 0);"
+				onpopupshowing="fireRibbon.TinyMenuEvent(event, 1);"/>
+			</toolbarbutton>
+
+			  
+			<toolbaritem id="ff-bookmarks" align="center">
+			  <toolbarbutton id="bookmarks-button" type="menu" orient="vertical" popup="bookmarksMenuPopup"
+				label="&bookmarks.label;" tooltiptext="&bookmarks.tip;"
+				noarrow="true" class="toolbarbutton-1"
+				onclick="fireRibbon.HistoryClick(event);"/>
+			</toolbaritem>
+		  
+			<toolbaritem id="ff-history" align="center">
+			  <toolbarbutton id="history-button" type="menu" orient="vertical"
+				label="&history.label;" tooltiptext="&history.tip;" noarrow="true"
+				class="toolbarbutton-1" onclick="fireRibbon.HistoryClick(event);">
+				<menupopup id="ff-history-menu" type="places" tooltiptext=""
+				  context="" onclick="checkForMiddleClick(this, event);"
+				  onpopupshowing="fireRibbon.HistoryShowing(event);"
+				  place="place:type=0&amp;sort=4&amp;maxResults=15"/>
+			  </toolbarbutton>
+			  <toolbarbutton id="ff-undo-button" type="menu"
+				tooltiptext="&historyUndoMenu.label;">
+				<menupopup id="ff-undo-tab-menu" tooltiptext="" context=""
+				  onpopupshowing="fireRibbon.HistoryShowing(event);"/>
+			  </toolbarbutton>
+			</toolbaritem>
+		  
+		  
+			<toolbaritem id="fireRibbonItem" hidelabel="false" context="">
+			  <hbox id="fireRibbon">
+				<label  value="ribbon" onclick="fireRibbon.initRibbon()" tooltiptext="click to activate ribbon"/>
+			  </hbox>
+			  <popup id="y"> <button/></popup>
+			</toolbaritem>
+			
+			
+			
+			<toolbarbutton id="ff-LogoBtn" label="Logo" orient="vertical"
+				  hidelabel="true" onmousedown="commandCenter.start()" ondblclick="" accesskey="f">				  
+
+			</toolbarbutton>
+			
+		  </toolbarpalette>
+
+		  
+  
+  <toolbar id="toolbar-menubar"
+    fullscreentoolbar="true"
+    defaultset="fireRibbonItem,ff-titlebox,menubar-items,ff-menu-button,ff-controls">	
+  </toolbar>
+	
+	
+	
+	</toolbox>
+	<commandset id="mainCommandSet">
+	    <command id="cmd_handleBackspace" oncommand="" />
+		<command id="cmd_handleBackspace" oncommand="" />
+</commandset>
+	
+	
+	<popupset id="mainPopupSet">
+		<panel id="ff-commandcenter" type="panel"  orient="vertical"
+			   hidden="false" onpopupshowing="commandCenter.popupShowing(event);">
+		<textbox class="textbox" type="search"/>
+		<hbox id="ff-ogoBtn">
+			<groupbox class="checkboxcontainer">
+				<listbox/>
+			</groupbox>
+			<groupbox class="checkboxcontainer">
+				<listbox/>
+			</groupbox>
+		</hbox>
+		<hbox>
+			<button onclick="commandCenter.digestMenu()" flex="2">p</button>
+			<button onclick="commandCenter.persist()" flex="0" type="checkbox">p</button>
+		</hbox>
+</panel>
+
+		<panel id="mainPanel"
+			   orient="vertical"
+			   hidden="false" onpopupshowing="onViewToolbarsPopupShowing(event);">
+		  <groupbox class="checkboxcontainer"></groupbox>
+		  <hbox>
+			<toolbarbutton class="tabs-alltabs-button" tooltiptext="save" oncommand="fireRibbon.renametab(this.nextSibling.value,this)"/>
+			<textbox class="textbox"/>
+			<toolbarbutton class="tabs-newtab-button" tooltiptext="new" oncommand="fireRibbon.clonetab(this.previousSibling.value)"/>
+		  </hbox>
+		</panel>
+	</popupset>
+	</window>
+</overlay>

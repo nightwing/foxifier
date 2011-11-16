@@ -1,0 +1,126 @@
+
+resizer.frame-resizer {
+
+z-index: 800!important;
+}
+#fireRibbon >label{
+-moz-appearance:none!important;
+-moz-user-focus:none!important;
+margin:1px 2px!important;
+padding: 0px 6px !important;
+/*border-color: rgb(207, 214, 222)!important;*/
+color: rgb(0, 0, 0)!important;
+background-color: rgb(242, 246, 251);
+	
+border: none !important;
+-moz-border-radius:4px!important;
+
+ border: 1px solid transparent!important;
+-moz-box-align:center!important;
+
+}
+
+
+#fireRibbon > label:hover {
+ border:1px solid #CFD6DE !important;
+background:#F2F6FB !important;
+-moz-border-radius:4px!important
+
+}
+
+#fireRibbon{
+-moz-box-align:start!important;
+}
+
+
+#fireRibbon > label[checked="true"] {
+
+border:1px solid #CFD6DE !important;
+background:#E0E0F0 !important;
+-moz-border-radius:4px!important;
+color: rgb(6, 45, 117)!important;
+}
+
+/*
+#fireRibbon .menu-iconic-left{display:none!important}
+#fireRibbon .menu-accel-container{display:none!important}
+
+#fireRibbon > *:hover {
+  -moz-appearance: none !important;
+  border: 1px solid red !important;
+  background-color: #f2f6fb !important;
+  -moz-border-radius: 4px !important;
+   height:5px!important
+}
+*/
+
+
+
+/*
+
+
+toolbar#nav-bar  > toolbarbutton:not([id="cm-menu"]):not([class="box-inherit"]) .toolbarbutton-icon, 
+toolbar#toolbar-menubar > toolbarbutton:not([id="cm-menu"]):not([class="box-inherit"]) .toolbarbutton-icon, 
+toolbar#nav-bar  > toolbarpaletteitem toolbarbutton:not([id="cm-menu"]):not([class="box-inherit"]) .toolbarbutton-icon, 
+toolbar#toolbar-menubar > toolbarpaletteitem toolbarbutton:not([id="cm-menu"]):not([class="box-inherit"]):not([class="chevron"]) .toolbarbutton-icon,  
+toolbar#nav-bar  > toolbaritem toolbarbutton:not([id="cm-menu"]):not([class="box-inherit"]):not([id="go-button"]) .toolbarbutton-icon {
+	background: transparent url("chrome://chromifox/skin/images/blankbutton.png") 0px 0px no-repeat !important;
+	width: 20px !important;
+	height: 20px !important;
+	padding: 0px 0px 0px 0px !important;
+	margin: 0 !important;
+	}
+
+
+*/
+
+
+/*******menubar*********/
+
+#fireRibbon{
+background:#F2F7FD!important;
+/*margin-left:12px!important;*/
+}
+
+#fireRibbon,#main-menubar,#menubar-items{
+-moz-border-radius-topright:8px!important;
+-moz-border-radius-topleft:8px!important;
+}
+
+
+#ff-menu-button {
+  margin: 0px;
+  padding: 2px;
+  min-width: 20px;
+  -moz-appearance: none;
+  list-style-image: url("chrome://fireRibbon/skin/MenuBtnS.gif");  
+}
+
+toolbar[mode="full"] toolbarbutton[hidelabel="true"] > label {
+  display: none !important;
+}
+
+
+
+#ff-history #history-button {
+  margin-right: 0 !important;
+}
+
+#ff-history #ff-undo-button {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+
+#ff-undo-button .toolbarbutton-icon,
+#ff-undo-button .toolbarbutton-text {
+  display: none !important;
+}
+
+toolbarbutton[noarrow="true"] > dropmarker {
+  display: none !important;
+}
+
+#bookmarksMenu[hidden="true"] {
+  display: none !important;
+}

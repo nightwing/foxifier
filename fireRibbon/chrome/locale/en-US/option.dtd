@@ -1,0 +1,16 @@
+<!ENTITY addon.title    "Hide Caption">
+<!ENTITY taskbar.label  "Position of system taskbar">
+<!ENTITY tb_top.label   "Top">
+<!ENTITY tb_bottom.label "Bottom">
+<!ENTITY tb_left.label   "Left">
+<!ENTITY tb_right.label  "Right">
+<!ENTITY title.label  "Firefox title">
+<!ENTITY title_align.label "Align: ">
+<!ENTITY title_left.label  "Left">
+<!ENTITY title_right.label "Right">
+<!ENTITY title_center.label "Center">
+<!ENTITY title_width.label  "Title's width:">
+<!ENTITY title_desc.label   "(If value is empty, width is adjusted automatically)">
+<!ENTITY menu_button.label  "Tiny Menu (Main menu is moved into popmenu of button)">
+<!ENTITY min_on_close.label "Minimize to the taskbar when user clicks Close button">
+<!ENTITY status_title.label "Display title in status bar">

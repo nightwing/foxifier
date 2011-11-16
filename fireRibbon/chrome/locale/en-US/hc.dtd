@@ -1,0 +1,6 @@
+<!ENTITY titlebar.label "Title bar">
+<!ENTITY hidemenu.label "Hide Menu">
+<!ENTITY history.tip    "History Menu">
+<!ENTITY history.label  "History(M)">
+<!ENTITY bookmarks.tip  "Bookmarks Menu">
+<!ENTITY bookmarks.label "Bookmarks(M)">

@@ -1,0 +1,120 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+
+<!DOCTYPE overlay [
+  <!ENTITY % optionDTD SYSTEM "chrome://fireRibbon/locale/option.dtd"> %optionDTD;
+]>
+
+<dialog xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+	title="&addon.title;"
+	autosize="true"
+	resizable="no"
+	buttons="accept,cancel"
+	onload="Init();"
+	ondialogaccept="Save();">
+	
+<script src="chrome://fireRibbon/content/fireRibbon.js"/>
+
+<groupbox>
+  <caption label="&taskbar.label;"/>
+  <radiogroup id="tb-pos" orient="horizontal">
+	<radio id="tb-bottom" label="&tb_bottom.label;" selected="true"/>
+	<radio id="tb-top" label="&tb_top.label;"/>
+	<radio id="tb-left" label="&tb_left.label;"/>
+	<radio id="tb-right" label="&tb_right.label;"/>
+  </radiogroup>
+</groupbox>
+<groupbox>
+  <caption label="&title.label;"/>
+  <hbox align="center">
+  <label value="&title_align.label;"/>
+  <radiogroup id="title-align" orient="horizontal">
+	<radio id="title-left" label="&title_left.label;" selected="true"/>
+	<radio id="title-center" label="&title_center.label;"/>
+	<radio id="title-right" label="&title_right.label;"/>
+  </radiogroup>
+  </hbox>
+  <hbox height="8px"/>
+  <hbox align="center">
+	<label value="&title_width.label;"/>
+	<textbox id="title-width" width="60px"/>
+	<label value="&title_desc.label;"/>
+  </hbox>
+</groupbox>
+<hbox height="16px"/>
+<hbox align="center">
+  <checkbox id="ff_tiny_menu" label="&menu_button.label;" checked="{*true|false}"/>
+  <image src="chrome://fireRibbon/skin/MenuBtnS.gif" width="16" height="16"/>
+</hbox>
+<checkbox id="min_on_close" label="&min_on_close.label;" checked="{true|*false}"/>
+<checkbox id="status-title" label="&status_title.label;" checked="{true|*false}"/>
+
+<script type="application/x-javascript">
+  <![CDATA[
+
+	var pref = Components.classes["@mozilla.org/preferences-service;1"
+		].getService(Components.interfaces.nsIPrefService).getBranch(
+		"extensions.hide_caption.");
+
+	function Init() {
+		try {
+			var tb_pos = pref.getCharPref("taskbar_pos");
+			var pos_btn = document.getElementById("tb-"+tb_pos);
+			if (pos_btn)
+				document.getElementById("tb-pos").selectedItem =
+					pos_btn;
+		}
+		catch(e) {}
+
+		try {
+			var sPos = pref.getCharPref('TitlePos').split(",");
+			var align = sPos.length>0 ? sPos[0].toLowerCase() :
+				'left';
+			if (align!='left'&&align!='right') align = 'center';
+			document.getElementById("title-align").selectedItem
+				= document.getElementById("title-"+align);
+			document.getElementById("title-width").value = sPos.
+				length>1 ? sPos[1] : '';
+		}
+		catch(e) {}
+
+		document.getElementById("ff_tiny_menu").checked = pref.
+			getBoolPref("TinyMenu");
+		document.getElementById("min_on_close").checked = pref.
+			getBoolPref("min-on-close");
+		document.getElementById("status-title").checked = pref.
+			getBoolPref("StatusTitle");
+	}
+
+	function Save() {
+		var title, width, merge, cName, fWins, tiny;
+		
+		tiny  = document.getElementById("ff_tiny_menu").checked;
+		merge = document.getElementById("status-title").checked;
+		pref.setCharPref("taskbar_pos", document.getElementById(
+			"tb-pos").selectedItem.id.substr(3));
+		pref.setBoolPref("min-on-close", document.getElementById
+			("min_on_close").checked);
+		pref.setBoolPref("StatusTitle", merge);
+		pref.setBoolPref("TinyMenu", tiny);
+
+		width = document.getElementById("title-width").value;
+		title = document.getElementById("title-align").selectedItem
+			.id.substr(6) + (width.length?","+width:"");
+		pref.setCharPref("TitlePos", title);
+		cName = "@mozilla.org/appshell/window-mediator;1";
+		fWins = Components.classes[cName].getService(Components.
+			interfaces.nsIWindowMediator).getEnumerator('navigator:browser');
+		while(fWins.hasMoreElements()) {
+			Document = fWins.getNext().document;
+			fireRibbon.InitWindow(Document, title, merge);
+			if (tiny) fireRibbon.ShowHideMenu(Document, true);
+		}
+
+		return true;
+	}
+
+  ]]>
+</script>
+  
+</dialog>
