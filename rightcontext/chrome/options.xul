@@ -11,7 +11,7 @@
 	width="450" height="600"
 	resizable='yes' onunload='savePrefs()'>
 <script>
-/*Components.utils.import("resource://gre/modules/Services.jsm");
+Components.utils.import("resource://gre/modules/Services.jsm");
 try{
 	if(window.opener &amp;&amp; window.opener.location.href=='about:addons'){
 		Services.ww.openWindow(null, window.location, "_blank", 'dialog=no,centerscreen,resizable', null)
@@ -20,7 +20,7 @@ try{
 	}
 }catch(e){
 	Components.utils.reportError(e)
-}*/
+}/**/
 </script>
 
 <svg:svg height="0">
@@ -179,7 +179,7 @@ row{
 	<tabpanels  flex='1'>
 		<tabpanel orient='vertical'  flex='1'>
 			<hbox align='center'>
-				<textbox placeholder="Search Plugins" flex='1' class='normal' width='0' id='pluginFilter'
+				<textbox placeholder="filter items" flex='1' class='normal' width='0' id='pluginFilter'
 					oninput="rebuild();this.nextSibling.hidden = !this.value;"/>
 				<resetbutton hidden='true' onclick='var t = this.previousSibling;t.value="";t.oninput()' />
 			</hbox>

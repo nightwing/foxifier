@@ -43,7 +43,6 @@ rightContext.duplicate = function(){
 	gBrowser.moveTabTo(newTab, tab._tPos)
 }
 
-dump(1)
 
 rightContext.undoCloseTab = function(e){
 	var item = e.target;
@@ -100,7 +99,7 @@ rightContext.populateUndoSubmenu = function(popup) {
         return;
     }
     undoMenu.removeAttribute("disabled");
-    var undoItems = JSON.parse(_ss.getClosedTabData(window));
+    var undoItems = JSON.parse(_ss.getClosedTabData(window));// eval4evar!
     for (var i = 0; i < undoItems.length; i++) {
         var m = document.createElement("menuitem");
         m.setAttribute("label", undoItems[i].title);
@@ -466,8 +465,7 @@ rightContext.init = function(enable) {
         document.documentElement.appendChild(s)
 		this.initStyles()
 	}else{
-		var s = document.querySelector('style[src^="chrome://rightContext/content/"]')
-		this.remove(s)
+		this.remove(this.styleSheet)
 		var s = document.querySelector('script[src^="chrome://rightContext/content/"]')
 		this.remove(s)
 	}
