@@ -82,11 +82,12 @@ rightContext.modifyTabContextMenu = function(enable) {
 		onpopupshowing: "rightContext.populateUndoSubmenu(this)"
 	})
 	rightContext.elem(tabContextMenu, 'menuitem', {
-		id: "context_duplicate", label: "Duplicate", accesskey: "D",
+		id: "right-context_duplicate", label: "Duplicate", accesskey: "D",
 		oncommand:"rightContext.duplicate()"
 	}, 1)
 }
 
+// taken from http://mxr.mozilla.org/mozilla-central/source/browser/base/content/browser-places.js#565
 rightContext.populateUndoSubmenu = function(popup) {
 	var _ss = Cc["@mozilla.org/browser/sessionstore;1"].getService(Ci.nsISessionStore)
     var undoMenu = popup.parentNode;
@@ -99,7 +100,7 @@ rightContext.populateUndoSubmenu = function(popup) {
         return;
     }
     undoMenu.removeAttribute("disabled");
-    var undoItems = eval("(" + _ss.getClosedTabData(window) + ")");
+    var undoItems = JSON.parse(_ss.getClosedTabData(window));
     for (var i = 0; i < undoItems.length; i++) {
         var m = document.createElement("menuitem");
         m.setAttribute("label", undoItems[i].title);
@@ -425,19 +426,14 @@ rightContext.modifyContextMenu = function(enable){
 		gBrowser.removeEventListener("mouseup", rightContext.saveMousePos, false)
 				
 		this.remove("right-context-searchselect")
-		this.remove("right-context-openlinkintab")
-		
-		// this.showItem("context-searchselect", true)
-		// this.showItem("context-openlinkincurrent", true)
-		// this.showItem("context-openlinkintab", true)
-		// this.showItem("context-openlink", true)		
+		this.remove("right-context-openlinkintab")	
 	}
 }
 rightContext.initStyles = function(){	
 	var pref = Cu.import("resource://gre/modules/XPIProvider.jsm").XPIProvider.bootstrapScopes["right@context.a.am"].pref.get()
 
 	var hideCss = "#" + pref.replace(',', ",#", "g") + '{display:none}'
-	this.styleSheet.innerHTML=
+	this.styleSheet.textContent = // innerHTML
 'menuitem.split-menuitem-item[_moz-menuactive="true"], .split-menu-right-image[_moz-menuactive="true"] {/*for xp*/\
     background-color: -moz-menuhover;\
     color: -moz-menuhovertext;\
