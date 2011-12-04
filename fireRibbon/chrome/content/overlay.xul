@@ -1,5 +1,4 @@
 <?xml version="1.0"?>
-<?xml-stylesheet href="chrome://global/skin" type="text/css"?>
 <?xml-stylesheet href="chrome://fireRibbon/skin/style.css" type="text/css"?>
 
 <!DOCTYPE overlay [
@@ -10,25 +9,19 @@
 <overlay id="fireRibbon" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
 	<window id="main-window">
-
-    <script src="chrome://fireRibbon/content/fireRibbon.js"/>
-  
-  
-    <toolbox id="navigator-toolbox" class="toolbox-top" mode="icons"
-           defaultmode="icons">
-		   
-	
-		  <toolbarpalette id="BrowserToolbarPalette">
+		<script src="chrome://fireRibbon/content/fireRibbon.js"/>
+	</window>   
+    <toolbox id="navigator-toolbox" class="toolbox-top" mode="icons" defaultmode="icons">  
+		<toolbarpalette id="BrowserToolbarPalette">
 			<toolbarbutton id="ff-menu-button" orient="vertical" noarrow="true"
 			  label="&hidemenu.label;" hidelabel="true" class="toolbarbutton-1"
 			  onclick="fireRibbon.MenuBtnClick(event, 0);"
 			  ondblclick="fireRibbon.MenuBtnClick(event, 1);"
 			  onmouseover="fireRibbon.MenuBtnOver(event);"
-			  context=""
-			  >
-			  <menupopup id="ff-btn-menu" tooltiptext="" context=""
-				onpopuphidden ="fireRibbon.TinyMenuEvent(event, 0);"
-				onpopupshowing="fireRibbon.TinyMenuEvent(event, 1);"/>
+			  context="">
+				<menupopup id="ff-btn-menu" tooltiptext="" context=""
+					onpopuphidden ="fireRibbon.TinyMenuEvent(event, 0);"
+					onpopupshowing="fireRibbon.TinyMenuEvent(event, 1);"/>
 			</toolbarbutton>
 
 			  
@@ -55,30 +48,22 @@
 			  </toolbarbutton>
 			</toolbaritem>
 		  
-		  
-			<toolbaritem id="fireRibbonItem" hidelabel="false" context="">
+		  	<toolbaritem id="fireRibbonItem" hidelabel="false" context="">
 			  <hbox id="fireRibbon">
 				<label  value="ribbon" onclick="fireRibbon.initRibbon()" tooltiptext="click to activate ribbon"/>
 			  </hbox>
 			  <popup id="y"> <button/></popup>
 			</toolbaritem>
 			
-			
-			
 			<toolbarbutton id="ff-LogoBtn" label="Logo" orient="vertical"
-				  hidelabel="true" onmousedown="commandCenter.start()" ondblclick="" accesskey="f">				  
-
-			</toolbarbutton>
-			
-		  </toolbarpalette>
+				  hidelabel="true" onmousedown="commandCenter.start()" ondblclick="" accesskey="f">	
+			</toolbarbutton>			
+		</toolbarpalette>
 
 		  
   
-  <toolbar id="toolbar-menubar"
-    fullscreentoolbar="true"
-    defaultset="fireRibbonItem,ff-titlebox,menubar-items,ff-menu-button,ff-controls">	
-  </toolbar>
-	
+		<toolbar id="toolbar-menubar" fullscreentoolbar="true" defaultset="fireRibbonItem,ff-titlebox,menubar-items,ff-menu-button,ff-controls">	
+		</toolbar>	
 	
 	
 	</toolbox>
@@ -86,7 +71,6 @@
 	    <command id="cmd_handleBackspace" oncommand="" />
 		<command id="cmd_handleBackspace" oncommand="" />
 </commandset>
-	
 	
 	<popupset id="mainPopupSet">
 		<panel id="ff-commandcenter" type="panel"  orient="vertical"
@@ -117,5 +101,4 @@
 		  </hbox>
 		</panel>
 	</popupset>
-	</window>
 </overlay>

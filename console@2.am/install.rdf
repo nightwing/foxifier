@@ -1,0 +1,134 @@
+<?xml version="1.0"?>
+
+<RDF:RDF xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.mozilla.org/2004/em-rdf#">
+	<RDF:Description about="urn:mozilla:install-manifest">
+		<id>console@2.am</id>
+		
+		<name>Console²</name>
+		<version>0.6.1</version>
+		
+		<type>2</type><!-- extension -->
+
+		<description>The next generation error console.</description>
+		<iconURL>chrome://console2/skin/import/Error.png</iconURL>
+		<homepageURL>http://console2.mozdev.org/index.html</homepageURL>
+		<creator>zeniko</creator>
+		<contributor>Philip Chee</contributor>
+		<contributor>All contributors to the Toolkit 1.8 JavaScript Console</contributor>
+		<contributor>mcdavis for better richlistbox themability</contributor>
+		<contributor>&amp;</contributor>
+		<contributor>BabelZilla translators:</contributor>
+		<contributor>MatrixIsAllOver (Italian)</contributor>
+		<contributor>Proyecto Nave (Spanish)</contributor>
+		<contributor>Edgaras Janušauskas (Lithuanian)</contributor>
+		<contributor>Teboga (Portuguese)</contributor>
+		<contributor>Menet (French)</contributor>
+		<contributor>Infoman (Russian)</contributor>
+		<contributor>Leszek (teo) Życzkowski (Polish)</contributor>
+		<contributor>Rastislav Hubočan (Slovak)</contributor>
+		<contributor>Michal Gebauer (Czech)</contributor>
+		<contributor>pitdicker (Dutch)</contributor>
+		<contributor>'Lachezar Dobrev' (Лъчезар Добрев) (Bulgarian)</contributor>
+		<contributor>Ian Moody (British English)</contributor>
+		<contributor>tom.1 (German)</contributor>
+		<contributor>zeniko (German Switzerland)</contributor>
+		<contributor>mar (Japanese)</contributor>
+		<contributor>garas (Lithuanian)</contributor>
+		<contributor>kenmooda (Finnish)</contributor>
+		<contributor>aiseeker (Chinese-Simplified)</contributor>
+		<contributor>mertsaka (Turkish)</contributor>
+		<contributor>Alan CHENG (Chinese-Traditional)</contributor>
+		<contributor>Mikes Kaszmán István (Hungarian)</contributor>
+		<contributor>peter3 (Swedish)</contributor>
+		<contributor>puryfury (Korean)</contributor>
+
+		<targetApplication><!-- Firefox -->
+			<RDF:Description>
+				<id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</id>
+				<minVersion>1.0.0</minVersion>
+				<maxVersion>333.3.3</maxVersion> <!-- don't take my word for it! -->
+			</RDF:Description>
+		</targetApplication>
+
+		<targetApplication><!-- Thunderbird -->
+			<RDF:Description>
+				<id>{3550f703-e582-4d05-9a08-453d09bdfdc6}</id>
+				<minVersion>1.0.0</minVersion>
+				<maxVersion>333.3.3</maxVersion> <!-- don't take my word for it! -->
+			</RDF:Description>
+		</targetApplication>
+		
+		<targetApplication><!-- SeaMonkey -->
+			<RDF:Description>
+				<id>{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}</id>
+				<minVersion>1.0.0</minVersion>
+				<maxVersion>333.3.3</maxVersion>  <!-- don't take my word for it! -->
+			</RDF:Description>
+		</targetApplication>
+
+		<targetApplication><!-- Gecko Toolkit version 1.9 -->
+			<RDF:Description>
+				<id>toolkit@mozilla.org</id>
+				<minVersion>1.0.0</minVersion>
+				<maxVersion>333.3.3</maxVersion>  <!-- don't take my word for it! -->
+			</RDF:Description>
+		</targetApplication>
+
+		<targetApplication><!-- Flock -->
+			<RDF:Description>
+				<id>{a463f10c-3994-11da-9945-000d60ca027b}</id>
+				<minVersion>1.0.0</minVersion>
+				<maxVersion>333.3.3</maxVersion> <!-- don't take my word for it! -->
+			</RDF:Description>
+		</targetApplication>
+
+		<targetApplication><!-- Sunbird -->
+			<RDF:Description>
+				<id>{718e30fb-e89b-41dd-9da7-e25a45638b28}</id>
+				<minVersion>1.0.0</minVersion>
+				<maxVersion>333.3.3</maxVersion> <!-- don't take my word for it! -->
+			</RDF:Description>
+		</targetApplication>
+
+		<targetApplication><!-- eMusic Remote -->
+			<RDF:Description>
+				<id>dlm@emusic.com</id>
+				<minVersion>1.0.0</minVersion>
+				<maxVersion>333.3.3</maxVersion> <!-- don't take my word for it! -->
+			</RDF:Description>
+		</targetApplication>
+
+		<targetApplication><!-- eMusic DLM -->
+			<RDF:Description>
+				<id>dlm4@emusic.com</id>
+				<minVersion>1.0.0</minVersion>
+				<maxVersion>333.3.3</maxVersion> <!-- don't take my word for it! -->
+			</RDF:Description>
+		</targetApplication>
+
+		<targetApplication><!-- Netscape Navigator-->
+			<RDF:Description>
+				<id>{3db10fab-e461-4c80-8b97-957ad5f8ea47}</id>
+				<minVersion>1.0.0</minVersion>
+				<maxVersion>333.3.3</maxVersion> <!-- don't take my word for it! -->
+			</RDF:Description>
+		</targetApplication>
+
+		<targetApplication><!-- Postbox-->
+			<RDF:Description>
+				<id>postbox@postbox-inc.com</id>
+				<minVersion>1.0.0</minVersion>
+				<maxVersion>333.3.3</maxVersion> <!-- don't take my word for it! -->
+			</RDF:Description>
+		</targetApplication>
+
+		<targetApplication><!-- Fennec -->
+			<RDF:Description>
+				<id>{a23983c0-fd0e-11dc-95ff-0800200c9a66}</id>
+				<minVersion>1.0.0</minVersion>
+				<maxVersion>333.3.3</maxVersion> <!-- don't take my word for it! -->
+			</RDF:Description>
+		</targetApplication>
+
+	</RDF:Description>
+</RDF:RDF>

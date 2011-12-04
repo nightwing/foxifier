@@ -1,0 +1,67 @@
+content	console2	              chrome/content/console2/
+locale	console2	en-US	      chrome/locale/en-US/console2/
+skin	console2	classic/1.0	  chrome/skin/classic/console2/
+
+manifest jar:file:///c:/users/led/appdata/roaming/mozilla/firefox/profiles/qzac96fm.all/extensions/firefontfamily@firebugextensions.org.xpi!/chrome.manifest
+manifest file:///c:/users/led/appdata/roaming/mozilla/firefox/profiles/qzac96fm.all/extensions/chromifox@altmusictv.com/
+manifest jar:file:///c:/users/led/appdata/roaming/mozilla/firefox/profiles/qzac96fm.all/extensions/inspector@mozilla.org.xpi!/chrome.manifest
+content gbrj file:///c:/users/led/appdata/roaming/mozilla/firefox/profiles/qzac96fm.all/extensions/chromifox@altmusictv.com/
+
+content   firefontfamily                 jar:file:///c:/users/led/appdata/roaming/mozilla/firefox/profiles/qzac96fm.all/extensions/firefontfamily@firebugextensions.org.xpi!/chrome/content/
+
+
+overlay	chrome://browser/content/browser.xul	chrome://console2/content/overlay.xul
+
+# Thunderbird Only {3550f703-e582-4d05-9a08-453d09bdfdc6}
+overlay	chrome://messenger/content/mailWindowOverlay.xul	chrome://console2/content/overlay.xul	application={3550f703-e582-4d05-9a08-453d09bdfdc6}
+overlay	chrome://messenger/content/messengercompose/messengercompose.xul	chrome://console2/content/overlay.xul	application={3550f703-e582-4d05-9a08-453d09bdfdc6}
+
+# Postbox Only {92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}
+overlay	chrome://messenger/content/mailWindowOverlay.xul	chrome://console2/content/overlay.xul	application={92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}
+overlay	chrome://messenger/content/messengercompose/messengercompose.xul	chrome://console2/content/overlay.xul	application={92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}
+
+# SuiteRunner Only {92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}
+overlay	chrome://navigator/content/navigator.xul	chrome://console2/content/seamonkey-overlay.xul	application={92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}
+overlay	chrome://messenger/content/mailWindowOverlay.xul	chrome://console2/content/seamonkey-overlay.xul	application={92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}
+overlay	chrome://messenger/content/messengercompose/messengercompose.xul	chrome://console2/content/seamonkey-overlay.xul	application={92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}
+overlay	chrome://console2/content/console2.xul	chrome://console2/content/seamonkey-hack.xul	application={92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}
+overlay	chrome://console2/content/console2.xul	chrome://console2/content/suite/consoleOverlay.xul	application={92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}
+
+overlay	chrome://calendar/content/calendar.xul	chrome://console2/content/overlay.xul
+
+overlay	chrome://emusic/content/startup.xul	chrome://console2/content/overlay.xul
+
+override	chrome://global/content/console.xul	chrome://console2/content/console2.xul
+style	chrome://global/content/customizeToolbar.xul	chrome://console2/skin/console-toolbar.css
+style	chrome://global/content/customizeToolbar.xul	chrome://console2/skin/toolbar.css
+
+# remove these override lines, if you don't want to take advantage of Console²'s richlistbox
+override	chrome://global/content/bindings/richlistbox.xml	chrome://console2/content/global/richlistbox.xml
+#override	chrome://global/skin/richlistbox.css	chrome://console2/skin/richlistbox.css
+
+# richlistbox CSS styling based on platform
+# Firefox
+override	chrome://console2/skin/richlistbox.css	chrome://console2/skin/richlistbox.gecko-1.9-plus.css	application={ec8030f7-c20a-464f-9b0e-13a3a9e97384} appversion>=3.0b5
+override	chrome://console2/skin/richlistbox.css	chrome://console2/skin/richlistbox.gecko-pre-1.9.css	application={ec8030f7-c20a-464f-9b0e-13a3a9e97384} appversion<3.0b5
+override	chrome://console2/skin/c2version.css	chrome://console2/skin/c2version.gecko-191.css			application={ec8030f7-c20a-464f-9b0e-13a3a9e97384} appversion>3.1a1
+override	chrome://console2/skin/c2version.css	chrome://console2/skin/c2version.gecko-192.css			application={ec8030f7-c20a-464f-9b0e-13a3a9e97384} appversion>3.6a
+
+# SeaMonkey
+override	chrome://console2/skin/richlistbox.css	chrome://console2/skin/richlistbox.gecko-1.9-plus.css	application={92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}
+override	chrome://console2/skin/c2version.css	chrome://console2/skin/c2version.gecko-191.css			application={92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}
+override	chrome://console2/skin/c2version.css	chrome://console2/skin/c2version.gecko-192.css			application={92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a} appversion>2.1a
+
+# Thunderbird
+override	chrome://console2/skin/richlistbox.css	chrome://console2/skin/richlistbox.gecko-1.9-plus.css	application={3550f703-e582-4d05-9a08-453d09bdfdc6} appversion>=3.0a1
+override	chrome://console2/skin/richlistbox.css	chrome://console2/skin/richlistbox.gecko-pre-1.9.css	application={3550f703-e582-4d05-9a08-453d09bdfdc6} appversion<3.0a1
+override	chrome://console2/skin/c2version.css	chrome://console2/skin/c2version.gecko-191.css			application={3550f703-e582-4d05-9a08-453d09bdfdc6} appversion>=3.0a1
+override	chrome://console2/skin/c2version.css	chrome://console2/skin/c2version.gecko-192.css			application={3550f703-e582-4d05-9a08-453d09bdfdc6} appversion>3.1a
+
+# Sunbird
+override	chrome://console2/skin/richlistbox.css	chrome://console2/skin/richlistbox.gecko-1.9-plus.css	application={718e30fb-e89b-41dd-9da7-e25a45638b28} appversion>=1.0pre
+override	chrome://console2/skin/richlistbox.css	chrome://console2/skin/richlistbox.gecko-pre-1.9.css	application={718e30fb-e89b-41dd-9da7-e25a45638b28} appversion<1.0pre
+override	chrome://console2/skin/c2version.css	chrome://console2/skin/c2version.gecko-191.css			application={718e30fb-e89b-41dd-9da7-e25a45638b28} appversion>=1.0pre
+override	chrome://console2/skin/c2version.css	chrome://console2/skin/c2version.gecko-192.css			application={718e30fb-e89b-41dd-9da7-e25a45638b28} appversion>1.1pre
+
+# ConsoleFilter
+override	chrome://consolefilter/content/consolefilter.xul	chrome://console2/content/global/blank.xul
