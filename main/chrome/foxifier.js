@@ -183,6 +183,30 @@ window.addEventListener("load", function(){
 	TabHistory.init()
 	delete TabHistory.init
 	gFindBar._shouldFastFind=function(){}
+	
+	
+	gBrowser.tabContainer.addEventListener("click", function(event) {
+		if (event.button != 1)
+			return;
+
+		if (event.target.localName == "tab") {
+		  if (this.childNodes.length > 1){
+			  //this.tabbrowser
+			  var t = gBrowser.visibleTabs
+			var tab = event.target
+			gBrowser.moveTabTo(tab, t[t.length - 1]._tPos);
+			gBrowser.selectedTab = tab
+			//tab.focus();
+		  }
+		} else if (event.originalTarget.localName == "box") {
+		  BrowserOpenTab();
+		} else {
+		  return;
+		}
+
+		event.stopPropagation();    
+		event.preventDefault();    
+	}, true)
 }, false);
 
 
@@ -323,3 +347,15 @@ var cookieSwap = {
 // Services.cookies is missing on ff4 
 if(!Services.cookies)
 	Services.cookies = Cc["@mozilla.org/cookiemanager;1"].getService(Ci.nsICookieManager2)
+	
+	
+	
+	
+
+	
+	
+	
+
+
+
+

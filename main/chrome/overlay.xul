@@ -3,14 +3,7 @@
 <overlay id="tab_history_overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">	
 	<script type="application/x-javascript" src="chrome://foxifier/content/foxifier.js"></script>
 	
-<menupopup id="contentAreaContextMenu"
-	   onpopupshowing="if (event.target != this)
-						 return true;
-					   gContextMenu = new nsContextMenu(this, gBrowser);
-					   if (gContextMenu.shouldDisplay)
-						 updateEditUIVisibility();
-					   return gContextMenu.shouldDisplay;"
-	   onpopuphiding="if (event.target == this) { gContextMenu = null; updateEditUIVisibility(); }">
+<menupopup id="contentAreaContextMenu" >
 
       <menuitem id="context-openlinkintab" removeelement="true"/>	   
       <menuitem id="context-openlinkincurrent" removeelement="true"/>
