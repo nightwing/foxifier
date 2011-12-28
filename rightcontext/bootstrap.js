@@ -14,7 +14,8 @@ pref = {
 			var pref=Services.prefs.getCharPref(this.name)
 		else
 			var pref=this.defVal
-		return pref.replace('#', "context-", "g")
+		
+		return pref.replace('#', "context-", "g") + '#context_reloadTab,#context_undoCloseTab'
 	},
 	save: function(idList){
 	
@@ -33,12 +34,11 @@ var Ci = Components.interfaces;
 Components.utils.import("resource://gre/modules/Services.jsm");
 
 function loadIntoWindow(aWindow) {
-	for each(var x in ["rightContext"])try{
-			//Services.scriptloader.loadSubScript( 'resource://instantmaps/'+x+'.js', aWindow);
-			var script = aWindow.document.createElementNS("http://www.w3.org/1999/xhtml",'html:script');
-				script.src = 'chrome://rightContext/content/'+x+'.js';
-				script.type="text/javascript;version=1.8";
-				aWindow.document.documentElement.appendChild(script);
+	/*devel__(*/
+		Services.obs.notifyObservers(null, "startupcache-invalidate", null);
+	/*devel__)*/
+	try {
+		Services.scriptloader.loadSubScript('chrome://rightContext/content/'+x+'.js', aWindow);
 	}catch(e){Components.utils.reportError(e)}
 }
 
@@ -54,13 +54,12 @@ function unloadFromWindow(aWindow){
 WindowListener={
 	onOpenWindow: function(aWindow){
 		// Wait for the window to finish loading
-		// see https://bugzilla.mozilla.org/show_bug.cgi?id=670235 for Ci.nsIDOMWindowInternal||Ci.nsIDOMWindow
-		aWindow = aWindow.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowInternal||Ci.nsIDOMWindow).window;
+		aWindow = aWindow.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindow).window;
 		aWindow.addEventListener("load", function() {
-			if(aWindow.location.href != 'chrome://browser/content/browser.xul')
-				return
 			aWindow.removeEventListener("load", arguments.callee, false);
-				loadIntoWindow(aWindow)
+			if (aWindow.location.href != 'chrome://browser/content/browser.xul')
+				return
+			loadIntoWindow(aWindow)
 		}, false);
 	},
 	onCloseWindow: function(aWindow){ },

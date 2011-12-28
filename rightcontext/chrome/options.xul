@@ -4,7 +4,7 @@
 <?xml-stylesheet href="chrome://shadia/content/css/global.css" type="text/css"?>
 <!--devel__) -->
 
-<window xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+<prefwindow xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 	xmlns:html="http://www.w3.org/1999/xhtml"
 	xmlns:svg='http://www.w3.org/2000/svg'
 	title="right context options"
@@ -172,9 +172,16 @@ dropmarker[type="button"]{
 row{
 	-moz-box-align: center;
 }
-
+.prefWindow-dlgbuttons{
+	display:none
+}
+prefpane{
+	padding:2px!important;
+	margin:0!important;
+}
 </html:style>
 
+<prefpane flex='1'>
 <tabbox flex='1'>
 	<tabpanels  flex='1'>
 		<tabpanel orient='vertical'  flex='1'>
@@ -199,7 +206,7 @@ row{
 	<slickbutton label='ok' oncommand='resultOK=true;close()'/>
 </hbox>
 
-
+</prefpane>
 
 <menupopup id="context" onpopupshowing='initContextMenu(this)' oncommand='onContextMenuCommand(event)'>
 	<menuitem label='enabled' type='checkbox' aID='visible'/>
@@ -469,4 +476,4 @@ window.addEventListener("DOMContentLoaded", function() {
 ]]></script>
 
 
-</window>
+</prefwindow>

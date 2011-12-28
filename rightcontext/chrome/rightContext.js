@@ -1,4 +1,4 @@
-rightContext = {}
+window.rightContext = {}
 rightContext.$ = function(x)document.getElementById(x)
 rightContext.elem = function(parent, name, props, before, children){
 	if(typeof parent=="string"){
@@ -30,12 +30,6 @@ rightContext.remove = function(el){
 	el && el.parentNode.removeChild(el)
 	return el
 }
-rightContext.showItem = function(id, show){
-	let node = this.$(id)
-	if(!node)
-		return
-	node.style.display = show?"":"none"
-}
 
 rightContext.duplicate = function(){
 	var tab = gBrowser.mContextTab||gBrowser.mCurrentTab;
@@ -60,12 +54,10 @@ rightContext.undoCloseTab = function(e){
 }
 rightContext.modifyTabContextMenu = function(enable) {
 	if(!enable){
-		this.showItem('context_reloadTab', true)
 		this.remove('right-context_undoCloseTab')
 		this.remove('right-context_duplicate')
 		return
 	}
-	this.showItem('context_reloadTab', false)
 	
 	var tabContextMenu = rightContext.$("tabContextMenu")	
 	
@@ -166,7 +158,6 @@ rightContext.isTextSelection = function() {
 	return selectedText;
 }
 rightContext.createSearchItem = function(){
-	//this.showItem("context-searchselect", false)
 		
 	var m = rightContext.elem('menu', {
 		id: "right-context-searchselect",
@@ -184,10 +175,6 @@ rightContext.createSearchItem = function(){
 	return m
 }
 rightContext.createOpenItem = function(){
-	// this.showItem("context-openlinkincurrent", false)
-	// this.showItem("context-openlinkintab", false)
-	// this.showItem("context-openlink", false)
-
 	var m = this.elem('menu', {
 		id: "right-context-openlinkintab",
 		label: "Open Link in New Tab",
