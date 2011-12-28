@@ -15,11 +15,11 @@ pref = {
 		else
 			var pref=this.defVal
 		
-		return pref.replace('#', "context-", "g") + '#context_reloadTab,#context_undoCloseTab'
+		return pref.replace('#', "context-", "g") + ',context_reloadTab,context_undoCloseTab'
 	},
-	save: function(idList){
+	save: function(idList) {
 	
-		idList = idList.sort()		
+		idList = idList.sort()
 		var str = idList.join(",").replace('context-', "#", "g")
 		if(str != this.defVal)
 			Services.prefs.setCharPref(this.name, str)
@@ -38,7 +38,7 @@ function loadIntoWindow(aWindow) {
 		Services.obs.notifyObservers(null, "startupcache-invalidate", null);
 	/*devel__)*/
 	try {
-		Services.scriptloader.loadSubScript('chrome://rightContext/content/'+x+'.js', aWindow);
+		Services.scriptloader.loadSubScript('chrome://rightContext/content/rightContext.js', aWindow);
 	}catch(e){Components.utils.reportError(e)}
 }
 
