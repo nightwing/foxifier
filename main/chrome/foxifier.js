@@ -246,8 +246,8 @@ function makeReq(href) {
 }
 
 var cookieSwap = {
-	getCookies: function(host){
-		var ans = [];
+	getCookies: function(host, cookieList){
+		var ans = cookieList || [];
 		var e = Services.cookies.getCookiesFromHost(host)
 		while(e.hasMoreElements()){
 			item=e.getNext(Ci.nsICookie).QueryInterface(Ci.nsICookie).QueryInterface(Ci.nsICookie2)
@@ -287,7 +287,7 @@ var cookieSwap = {
 	},
 
 	captureProfile: function(name){		
-		return this.profiles[name] = this.getCookies('google.com')
+		return this.profiles[name] = this.getCookies('google.com', this.getCookies('youtube.com'))
 	},
 	removeProfile: function(name){
 		if(this.profiles[name])
