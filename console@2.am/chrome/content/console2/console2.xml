@@ -493,7 +493,9 @@
 		<content>
 			<xul:box flex="1">
 				<xul:box class="console-row-icon" xbl:inherits="selected"
-						onclick='var p=this.parentNode.parentNode;$shadia.externalEditors.edit(p.getAttribute("href"), p.getAttribute("line"))'>
+						onclick='var p=this.parentNode.parentNode;
+						var href = p.getAttribute("href").split(" -> ").slice(-1)[0];
+						$shadia.externalEditors.edit(href, p.getAttribute("line"))'>
 					<xul:stack>
 						<xul:image xbl:inherits="src,type"/>
 						<xul:box/>
@@ -620,7 +622,10 @@
 					}
 					
 					var line = (context.gViewSourceUtils.openInExternalEditor.length == 5)?parseInt(this.getAttribute("line") || 0):undefined;
-					context.gViewSourceUtils.openInExternalEditor(this.getAttribute("href"), null, null, line);
+					
+					var href = this.getAttribute("href").split(" -> ").slice(-1)[0]
+					dump(href)
+					context.gViewSourceUtils.openInExternalEditor(href, null, null, line);
 					
 					return true;
 				]]></body>
@@ -629,10 +634,11 @@
 
 		<handlers>
 			<handler event="click" phase="capturing" button="0" preventdefault="true"><![CDATA[
+				var href = this.getAttribute("href").split(" -> ").slice(-1)[0]
 				if(event.originalTarget.className == "text-link" && !this._viewSource()){
-					openDialog("chrome://global/content/viewSource.xul", "_blank", "all,dialog=no", this.getAttribute("href"), null, null, this.getAttribute("line"));
+					openDialog("chrome://global/content/viewSource.xul", "_blank", "all,dialog=no", href, null, null, this.getAttribute("line"));
 				}else if(event.originalTarget.label=='npp'){
-					$shadia.externalEditors.edit(this.getAttribute("href"), this.getAttribute("line"))
+					$shadia.externalEditors.edit(href, this.getAttribute("line"))
 				}
 			]]></handler>
 		</handlers>

@@ -3,45 +3,6 @@
 <overlay id="tab_history_overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">	
 	<script type="application/x-javascript" src="chrome://foxifier/content/foxifier.js"></script>
 	
-<menupopup id="contentAreaContextMenu" >
-
-      <menuitem id="context-openlinkintab" removeelement="true"/>	   
-      <menuitem id="context-openlinkincurrent" removeelement="true"/>
-      <menuitem id="context-openlink" removeelement="true"/>
-      <menuseparator id="context-sep-open"/>
-      <menuitem id="context-bookmarklink" removeelement="true"/>
-      <menuitem id="context-sendlink" removeelement="true"/>
-      <menuitem id="context-copyemail" removeelement="true"/>
-      <menuitem id="context-sendimage"  removeelement="true"/>
-      <menuitem id="context-setDesktopBackground"  removeelement="true"/>
-      <menuitem id="context-sendvideo"  removeelement="true"/>
-      <menuitem id="context-sendaudio"  removeelement="true"/>
-      <menuitem id="context-back"  removeelement="true"/>
-      <menuitem id="context-forward"  removeelement="true"/>
-      <menuitem id="context-reload"  removeelement="true"/>
-      <menuitem id="context-stop"  removeelement="true"/>
-      <menuseparator id="context-sep-selectall" removeelement="true"/>
-      <menuseparator id="context-sep-stop" removeelement="true"/>
-      <menuitem id="context-bookmarkpage"  removeelement="true"/>
-      <menuitem id="context-sendpage"  removeelement="true"/>
-      <menuseparator id="context-sep-viewbgimage"/>
-      <!-- <menuitem id="context-keywordfield"
-                label="&keywordfield.label;"
-                accesskey="&keywordfield.accesskey;"
-                oncommand="AddKeywordForSearchField();"/> -->
-      <!-- <menuitem id="context-searchselect" removeelement="true"/> -->
-      <menuitem id="favicon-reload" removeelement="true"/>
-      <menuitem id="context-viewpartialsource-selection" removeelement="true"/>
-
-      <menuseparator id="frame-sep"/>
-<!--       <menu id="frame" label="&thisFrameMenu.label;" accesskey="&thisFrameMenu.accesskey;">
-      </menu> -->
-      <menuseparator hidden="true" id="context-sep-bidi"  removeelement="true"/>
-      <menuitem hidden="true" id="context-bidi-text-direction-toggle" removeelement="true"/>
-      <menuitem hidden="true" id="context-bidi-page-direction-toggle" removeelement="true"/>
-    </menupopup>
-
-    
 	
 	<textbox id="urlbar" pmpack="end">
 		<progressmeter id="urlbar-progress-alt"  mode="normal" value="0" collapsed="true" />
