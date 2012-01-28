@@ -94,8 +94,8 @@ sourcelink > label {
 .console-box:not([modeCtx~="Chrome"]) > .console-row[category~="component"],
 .console-box:not([modeCtx~="Chrome"]) > .console-row[href^="chrome://"],
 .console-box:not([modeCtx~="Chrome"]) > .console-row[type="error"]:not([category]),
-.console-box:not([modeCtx~="Content"]) > .console-row:not([category]):not([href^="chrome://"]):not([type="error"]),
-.console-box:not([modeCtx~="Content"]) > .console-row[category]:not([category~="chrome"]):not([category~="component"]):not([href^="chrome://"]),
+.console-box:not([modeCtx~="Content"]) > .console-row:not([category]):not([href^="chrome://"]):not([href^="resource://"]):not([type="error"]),
+.console-box:not([modeCtx~="Content"]) > .console-row[category]:not([category~="chrome"]):not([category~="component"]):not([href^="chrome://"]):not([href^="resource://"]),
 .console-box[dupes="false"] > .console-row[dupe="true"],
 
 .console-row[type="hidden"] {

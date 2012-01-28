@@ -359,11 +359,11 @@ rightContext.getPlainLinkText = function(){
 		return linkText
 	}
 	
-	findMatch(/https?:\/\/[^\s]+/ig) ||
+	findMatch(/(https?|irc):\/\/[^\s]+/ig) ||
 	findMatch(/www\.[^\s]+/ig) ||
 	findMatch(/[a-z\d-]+\.[a-z\d-]+[^\s]*/ig)
 
-	return linkText.replace(/[\)\]\}\>\.;,]*$/, '')
+	return linkText.replace(/[\)\]\}\>\.;,"']*$/, '')
 }
 rightContext.isMouseOver = function(item){
 	var rect = item.getBoundingClientRect()

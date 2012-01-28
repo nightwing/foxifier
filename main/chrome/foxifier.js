@@ -24,6 +24,66 @@ var TabHistory ={// copies history from one tab to another, via tab.browser.sess
 	}
 };
 
+FullZoom.onLocationChange=function FullZoom_onLocationChange(aURI, aIsTabSwitch, aBrowser) {
+    if (!aURI || aIsTabSwitch) {
+		if (!this.button)
+			this.button = document.getElementById("zoomb")
+		var browser = aBrowser || gBrowser.selectedBrowser;
+		var markupDocumentViewer = browser.markupDocumentViewer;
+		this.button.label = markupDocumentViewer.fullZoom
+		return;
+    }
+    if (aURI.spec == "about:blank") {
+        this._applyPrefToSetting(undefined, aBrowser);
+        return;
+    }
+    var browser = aBrowser || gBrowser.selectedBrowser;
+    if (!aIsTabSwitch && browser.contentDocument.mozSyntheticDocument) {
+        ZoomManager.setZoomForBrowser(browser, 1);
+        return;
+    }
+    var markupDocumentViewer = browser.markupDocumentViewer;
+
+	markupDocumentViewer.textZoom = 1;
+	markupDocumentViewer.fullZoom = 1.1;
+}
+zoommy = {
+	attachTopup:function(p){
+		var s = p.querySelectorAll("scale")              
+		this.s1=s[0]
+		this.s2=s[1]
+		var t = p.querySelectorAll("textbox")              
+		this.t1=t[0]
+		this.t2=t[1]
+		
+		this.attachTopup = this.attachTopup_
+		this.attachTopup_()
+	},
+	attachTopup_:function(p){                
+		this.t1.value=20
+		this.t2.value=20
+		
+		this.s1.value=100-20
+		this.s2.value=100-20
+	},
+	onchange:function(e){
+		var t = e.target
+		var val = t.value
+		
+		if(t==this.t1){
+			this.s1.value=100-val
+		}else if(t==this.s1){
+			this.t1.value=100-val
+		}else if(t==this.t2){
+			this.s2.value=100-val
+		}else if(t==this.s2){
+			this.t2.value=100-val
+		}
+	},
+	schedule: function(){
+	
+	}	
+}
 
 //addonManager In window
 

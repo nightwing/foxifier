@@ -274,20 +274,14 @@ function unloadFromWindow(mWindow){
 	}catch(e){Components.utils.reportError(e)}
 }
 
-WindowListener={
-	onOpenWindow: function(aWindow){
-		// Wait for the window to finish loading
-		let domWindow = aWindow.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowInternal||Ci.nsIDOMWindow).window;
-		// see https://bugzilla.mozilla.org/show_bug.cgi?id=670235 for Ci.nsIDOMWindowInternal||Ci.nsIDOMWindow
-		domWindow.addEventListener("load", function() {
-			domWindow.removeEventListener("load", arguments.callee, false);
-			if(domWindow.CombinedStopReload)
-				loadIntoWindow(domWindow)
-			//Components.utils.reportError(domWindow.CombinedStopReload)
-		}, false); 
-	},
-	onCloseWindow: function(aWindow){ },
-	onWindowTitleChange: function(aWindow, aTitle){ }
+function windowWatcher(win, topic) {
+	if (topic == "domwindowopened") {
+		win.addEventListener("load", function() {
+			win.removeEventListener("load", arguments.callee, false);
+			if (win.location.href == 'chrome://browser/content/browser.xul')
+				loadIntoWindow(win)
+		}, false);
+	}
 }
 
 /**************************************************************************
@@ -303,7 +297,7 @@ function startup(aData, aReason) {
 		loadIntoWindow(win);
 	}
 	// Load into all new windows
-	wm.addListener(WindowListener);
+	Services.ww.registerNotification(windowWatcher)
 }
 
 function shutdown(aData, aReason) {	
@@ -317,7 +311,7 @@ function shutdown(aData, aReason) {
 		let win = enumerator.getNext();
 		unloadFromWindow(win);
 	}
-	wm.removeListener(WindowListener);
+	Services.ww.unregisterNotification(windowWatcher)
 }
 
 function install(aData, aReason){

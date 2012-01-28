@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 
-<overlay id="tab_history_overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">	
+<overlay id="tab_history_overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+	xmlns:h="http://www.w3.org/1999/xhtml">	
 	<script type="application/x-javascript" src="chrome://foxifier/content/foxifier.js"></script>
 	
 	
@@ -21,7 +22,7 @@
              <!-- <label value="mail" /> -->
          </hbox>
       </statusbarpanel>
-   </statusbar>
+    </statusbar>
 
    <popupset id="mainPopupSet">
       <menupopup id="cookie-element-list" oncommand="cookieSwap.onPopupCommand(event)"
@@ -48,7 +49,48 @@
              <label id="cookieswap-tooltip1" value="Click select a new profile and load mail"/>
          </vbox>
       </tooltip>
-   </popupset>
-   
-	
+       <panel id='zoom' ignorekeys='true' position="before_start"
+        noautofocus="true"  height='400' onpopupshowing="zoommy.attachTopup(this)" onchange="zoommy.onchange(event)"
+            orient="vertical">
+            <stack flex="1">
+                <vbox flex="1">
+                    <hbox class="r" flex="1" />
+                    <hbox class="r" flex="1" />
+                    <hbox class="r" flex="1" />
+                    <hbox class="r" flex="1" />
+                </vbox>
+                <vbox flex="1">
+                    <hbox flex="1">
+                        <scale orient="vertical" value="100" flex="1" />
+                        <scale orient="vertical" value="100" flex="1" />
+                    
+                    </hbox>
+                </vbox>
+                <resizer element="zoom" style="-moz-transform: scaleY(-1);" dir="topright"
+                right="0" top="0" width="16" height="16" />
+            </stack>
+                    
+            <hbox style="text-align:center">
+                <textbox class="plain" width="40" />
+                <textbox class="plain" width="40" />
+            </hbox>
+        </panel>
+	</popupset>
+	<toolbarpalette id="BrowserToolbarPalette">
+		<toolbarbutton  contextmenu="zoom"  popup='zoom' label='open popup' type="menu" id="zoomb">  </toolbarbutton>
+	</toolbarpalette>
+	<h:style>
+		.r {
+		    border: 1px solid CadetBlue;
+            background:inactiveborder
+		}        
+        #zoom{opacity:0.8}
+		#zoomb {}
+		#zoomb .toolbarbutton-text{
+			display:-moz-initial;
+		}
+		#zoomb .toolbarbutton-icon{
+			display: none;
+		} 
+	</h:style>
 </overlay>

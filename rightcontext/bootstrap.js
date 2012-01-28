@@ -51,30 +51,15 @@ function unloadFromWindow(aWindow){
 	}catch(e){Components.utils.reportError(e)}
 }
 
-WindowListener={
-	onOpenWindow: function(aWindow){
-		// Wait for the window to finish loading
-		aWindow = aWindow.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindow).window;
-		aWindow.addEventListener("load", function() {
-			aWindow.removeEventListener("load", arguments.callee, false);
-			if (aWindow.location.href != 'chrome://browser/content/browser.xul')
-				return
-			loadIntoWindow(aWindow)
+function windowWatcher(win, topic) {
+	if (topic == "domwindowopened") {
+		win.addEventListener("load", function() {
+			win.removeEventListener("load", arguments.callee, false);
+			if (win.location.href == 'chrome://browser/content/browser.xul')
+				loadIntoWindow(win)
 		}, false);
-	},
-	onCloseWindow: function(aWindow){ },
-	onWindowTitleChange: function(aWindow, aTitle){ },
-	forEach: function(func){
-		let enumerator = Services.wm.getEnumerator("navigator:browser");
-		while(enumerator.hasMoreElements()) {
-			let win = enumerator.getNext();
-			try{func(win)}catch(e){Components.utils.reportError(e)}
-		}		
 	}
 }
-
-
-
 
 /**************************************************************************
  * bootstrap.js API
@@ -84,9 +69,14 @@ function startup(aData, aReason) {
 		Components.manager.QueryInterface(Ci.nsIComponentRegistrar)
 							.addBootstrappedManifestLocation(aData.installPath)
 	// Load into any existing windows
-	WindowListener.forEach(loadIntoWindow)	
+	let enumerator = Services.wm.getEnumerator("navigator:browser");
+	while(enumerator.hasMoreElements()) {
+		let win = enumerator.getNext();
+		try{loadIntoWindow(win)}catch(e){Components.utils.reportError(e)}
+	}
+	WindowListener.forEach()	
 	// listener for loading into all new windows
-	Services.wm.addListener(WindowListener);
+	Services.ww.registerNotification(windowWatcher)
 }
 
 function shutdown(aData, aReason) {
@@ -100,7 +90,7 @@ function shutdown(aData, aReason) {
 		let win = enumerator.getNext();
 		unloadFromWindow(win);
 	}
-	Services.wm.removeListener(WindowListener);
+	Services.ww.unregisterNotification(windowWatcher)
 	
 	if (Services.vc.compare(Services.appinfo.platformVersion, "10.0") < 0)  
 		Components.manager.QueryInterface(Ci.nsIComponentRegistrar)
