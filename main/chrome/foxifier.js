@@ -20,11 +20,13 @@ var TabHistory ={// copies history from one tab to another, via tab.browser.sess
 		// previous eval statement was called, because it's already been executed.
 		var tabbrowser = document.getElementById("content");
 		eval('tabbrowser.addTab='+ tabbrowser.addTab.toString().replace(/(return t;)/,
-			"if((0==b.sessionHistory.count)&&aReferrerURI)TabHistory.copyHistory(this.selectedTab, t);\n $1"));
+			"if((0==b.sessionHistory.count)&&(aRelatedToCurrent||aReferrerURI))TabHistory.copyHistory(this.selectedTab, t);\n $1"));
 	}
 };
 
-FullZoom.onLocationChange=function FullZoom_onLocationChange(aURI, aIsTabSwitch, aBrowser) {
+FullZoom.onLocationChange = function FullZoom_onLocationChange(aURI, aIsTabSwitch, aBrowser) {
+	if (!aBrowser || aBrowser.zoomIsModified)
+		return
     if (!aURI || aIsTabSwitch) {
 		if (!this.button)
 			this.button = document.getElementById("zoomb")
@@ -44,9 +46,12 @@ FullZoom.onLocationChange=function FullZoom_onLocationChange(aURI, aIsTabSwitch,
     }
     var markupDocumentViewer = browser.markupDocumentViewer;
 
-	markupDocumentViewer.textZoom = 1;
-	markupDocumentViewer.fullZoom = 1.1;
+	markupDocumentViewer.textZoom = this._tzoom;
+	markupDocumentViewer.fullZoom = this._fzoom;
+	aBrowser.zoomIsModified = true
 }
+FullZoom._fzoom=1.2
+FullZoom._tzoom=1
 zoommy = {
 	attachTopup:function(p){
 		var s = p.querySelectorAll("scale")              

@@ -74,7 +74,6 @@ function startup(aData, aReason) {
 		let win = enumerator.getNext();
 		try{loadIntoWindow(win)}catch(e){Components.utils.reportError(e)}
 	}
-	WindowListener.forEach()	
 	// listener for loading into all new windows
 	Services.ww.registerNotification(windowWatcher)
 }
