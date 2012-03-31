@@ -257,10 +257,17 @@ window.addEventListener("load", function(){
 		if (event.target.localName == "tab") {
 		  if (this.childNodes.length > 1){
 			  //this.tabbrowser
-			  var t = gBrowser.visibleTabs
+			var t = gBrowser.visibleTabs
 			var tab = event.target
-			gBrowser.moveTabTo(tab, t[t.length - 1]._tPos);
-			gBrowser.selectedTab = tab
+			var pos = t[t.length - 1]._tPos
+			if (tab._tPos == pos) {
+				pos = t[0]._tPos
+				gBrowser.moveTabTo(tab, pos);
+				gBrowser.selectedTab = t[t.length - 1]
+			} else {
+				gBrowser.selectedTab = tab
+				gBrowser.moveTabTo(tab, pos);
+			}
 			//tab.focus();
 		  }
 		} else if (event.originalTarget.localName == "box") {
@@ -419,8 +426,19 @@ if(!Services.cookies)
 
 	
 	
+// my mouse is broken:(
+lastClickDate = 0
+window.addEventListener("click", function(e){
 	
-
-
+	if (e.button == 1) {
+		var now = Date.now()
+		dump(now-lastClickDate)
+		if (now - lastClickDate < 100){
+			e.preventDefault()
+			e.stopPropagation()
+		}
+		lastClickDate = now
+	}
+}, true)
 
 

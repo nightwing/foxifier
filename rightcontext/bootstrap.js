@@ -47,7 +47,6 @@ function unloadFromWindow(aWindow){
 		// delete all added variables and remove eventListeners
 		aWindow.rightContext.init(false)
 		delete aWindow.rightContext
-		// todo: may need to remove script elements added by loadIntoWindow
 	}catch(e){Components.utils.reportError(e)}
 }
 
