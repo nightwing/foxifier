@@ -1,9 +1,11 @@
 var TabHistory ={// copies history from one tab to another, via tab.browser.sessionHistory
 	copyHistory : function(fromTab, newTab){
-		var fromHistory = getBrowser().getBrowserForTab(fromTab).sessionHistory;
-		var toHistory = getBrowser().getBrowserForTab(newTab).sessionHistory;
+		var fromHistory = gBrowser.getBrowserForTab(fromTab).sessionHistory;
+		var toHistory = gBrowser.getBrowserForTab(newTab).sessionHistory;
 		// needed to use addEntry
 		toHistory.QueryInterface(Components.interfaces.nsISHistoryInternal);
+
+		// toHistory.count && toHistory.PurgeHistory(toHistory.count);
 		// copy oldHistory entries to newHistory, simulating a continued session
 		for(var i = 0; i < (fromHistory.index + 1); ++i){
 			toHistory.addEntry(fromHistory.getEntryAtIndex(i, false), true);
@@ -54,27 +56,27 @@ FullZoom._fzoom=1.2
 FullZoom._tzoom=1
 zoommy = {
 	attachTopup:function(p){
-		var s = p.querySelectorAll("scale")              
+		var s = p.querySelectorAll("scale")
 		this.s1=s[0]
 		this.s2=s[1]
-		var t = p.querySelectorAll("textbox")              
+		var t = p.querySelectorAll("textbox")
 		this.t1=t[0]
 		this.t2=t[1]
-		
+
 		this.attachTopup = this.attachTopup_
 		this.attachTopup_()
 	},
-	attachTopup_:function(p){                
+	attachTopup_:function(p){
 		this.t1.value=20
 		this.t2.value=20
-		
+
 		this.s1.value=100-20
 		this.s2.value=100-20
 	},
 	onchange:function(e){
 		var t = e.target
 		var val = t.value
-		
+
 		if(t==this.t1){
 			this.s1.value=100-val
 		}else if(t==this.s1){
@@ -86,8 +88,8 @@ zoommy = {
 		}
 	},
 	schedule: function(){
-	
-	}	
+
+	}
 }
 
 //addonManager In window
@@ -154,7 +156,8 @@ nsContextMenu.prototype.initViewItems = function() {
  *   status 4 evar
  */
 XULBrowserWindow.setOverLink=function (url) {
-    this.overLink = url.replace(/[\u200e\u200f\u202a\u202b\u202c\u202d\u202e]/g, encodeURIComponent);
+    this.overLink = url//url.replace(/[\u200e\u200f\u202a\u202b\u202c\u202d\u202e]/g, encodeURIComponent);
+	this.newColor = gBrowser.currentURI.spec.replace(/\/?#.*?$/,'') == url.replace(/\/?#.*?$/,'') ? 'green' : ''
     this.updateStatusField();
 }
 
@@ -170,7 +173,10 @@ XULBrowserWindow.updateStatusField = function () {
         field.setAttribute("type", type);
         field.value= text;
         field.setAttribute("crop", type == "overLink" ? "center" : "end");
-        this.statusText = text;
+        this.statusText = text;		
+		if(this.statusColor != (type == "overLink"?this.newColor:'')){
+			field.style.color = this.newColor
+		}
     }
 }
 
@@ -185,13 +191,13 @@ XULBrowserWindow.throbberElement = {
 	setAttribute:function(){this.el.collapsed=false},
 	removeAttribute:function(){this.el.collapsed=true;this.el.value=0}
 }
-XULBrowserWindow.init = function () {   
+XULBrowserWindow.init = function () {
 	delete this.statusTextField
 	this.statusTextField=document.createElement('label')
 	var a = document.getElementById("addon-bar")
-	a.insertBefore(this.statusTextField, a.firstChild) 
+	a.insertBefore(this.statusTextField, a.firstChild)
 	this.throbberElement.el=document.getElementById('urlbar-progress-alt')
-	
+
     var securityUI = gBrowser.securityUI;
     this._hostChanged = true;
     this.onSecurityChange(null, null, securityUI.state);
@@ -248,8 +254,8 @@ window.addEventListener("load", function(){
 	TabHistory.init()
 	delete TabHistory.init
 	gFindBar._shouldFastFind=function(){}
-	
-	
+
+
 	gBrowser.tabContainer.addEventListener("click", function(event) {
 		if (event.button != 1)
 			return;
@@ -276,8 +282,8 @@ window.addEventListener("load", function(){
 		  return;
 		}
 
-		event.stopPropagation();    
-		event.preventDefault();    
+		event.stopPropagation();
+		event.preventDefault();
 	}, true)
 }, false);
 
@@ -302,7 +308,7 @@ function getInProfileFilePath(name, getFile){
 		return dir
 	var fileHandler = Services.io.getProtocolHandler("file").QueryInterface(Ci.nsIFileProtocolHandler);
 	var uri = fileHandler.getURLSpecFromFile(dir);
-		
+
 	return uri
 }
 // todo: use async request
@@ -328,7 +334,7 @@ var cookieSwap = {
 				item.value,
 				item.isSecure, item.isHttpOnly, item.isSession,
 				item.expiry]
-			ans.push(cookieData)		
+			ans.push(cookieData)
 		}
 		return ans
 	},
@@ -340,7 +346,7 @@ var cookieSwap = {
 		//Services.cookies.remove(item.host, item.name, item.path, false)
 		Services.cookies.add.apply(Services.cookies, cookieData)
 	},
-	
+
 	saveProfileData: function(){
 		writeToFile(
 			getInProfileFilePath('cookieSwap.txt', true),
@@ -354,11 +360,11 @@ var cookieSwap = {
 			delete this.profiles
 			var profiles = JSON.parse(text)
 		}catch(e){Cu.reportError(e)}
-		
+
 		return this.profiles = profiles || {__currentProfile__: 'default'}
 	},
 
-	captureProfile: function(name){		
+	captureProfile: function(name){
 		return this.profiles[name] = this.getCookies('google.com', this.getCookies('youtube.com'))
 	},
 	removeProfile: function(name){
@@ -383,7 +389,7 @@ var cookieSwap = {
 		this.profiles.__currentProfile__ = name
 		setTimeout(this.saveProfileData.bind(this),10000)
 	},
-	
+
 	switchAndReload: function(name, loadMail){
 		var brs=gBrowser.browsers
 		var tbs=gBrowser.tabs
@@ -399,7 +405,7 @@ var cookieSwap = {
 		this.switchToProfile(name)
 		// loc = currentBr._contentWindow.location.href
 		if(loadMail)
-			getWebNavigation().loadURI('https://mail.google.com/mail/', 	
+			getWebNavigation().loadURI('https://mail.google.com/mail/',
 									nsIWebNavigation.LOAD_FLAGS_BYPASS_HISTORY |
 									nsIWebNavigation.LOAD_FLAGS_CHARSET_CHANGE |
 									nsIWebNavigation.LOAD_FLAGS_REPLACE_HISTORY,
@@ -414,9 +420,9 @@ var cookieSwap = {
 		if(name)
 			this.switchAndReload(name, !e.button)
 	}
-	
+
 }
-// Services.cookies is missing on ff4 
+// Services.cookies is missing on ff4
 if(!Services.cookies)
 	Services.cookies = Cc["@mozilla.org/cookiemanager;1"].getService(Ci.nsICookieManager2)
 	
