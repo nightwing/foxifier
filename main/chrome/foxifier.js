@@ -203,6 +203,46 @@ XULBrowserWindow.init = function () {
     this.onSecurityChange(null, null, securityUI.state);
 }
 /***************************************************************************
+ *   favicon in urlbar
+ */
+
+function SetPageProxyState(aState) {
+  if (!gURLBar) return;
+
+  if (!gProxyFavIcon)
+    gProxyFavIcon = document.getElementById("page-proxy-favicon");
+
+  gURLBar.setAttribute("pageproxystate", aState);
+  gProxyFavIcon.setAttribute("pageproxystate", aState);
+
+  // the page proxy state is set to valid via OnLocationChange, which
+  // gets called when we switch tabs.
+  if (aState == "valid") {
+    gLastValidURLStr = gURLBar.value;
+    gURLBar.addEventListener("input", UpdatePageProxyState, false);
+
+    PageProxySetIcon(gBrowser.getIcon());
+  } else if (aState == "invalid") {
+    gURLBar.removeEventListener("input", UpdatePageProxyState, false);
+    PageProxySetIcon();
+  }
+}
+
+function PageProxySetIcon (aURL) {
+    if (!gProxyFavIcon)
+        return;
+
+    if (!aURL)
+        gProxyFavIcon.removeAttribute("src");
+    else if (gProxyFavIcon.getAttribute("src") != aURL)
+        gProxyFavIcon.setAttribute("src", aURL);
+}
+XULBrowserWindow.onLinkIconAvailable = function (aIconURL) {
+    if (gBrowser.userTypedValue === null) PageProxySetIcon(aIconURL);
+}
+
+ 
+/***************************************************************************
  *   remove annoying shortcuts and "features"
  */
 BrowserHandleBackspace = BrowserHandleShiftBackspace = dump
