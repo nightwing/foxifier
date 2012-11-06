@@ -24,8 +24,9 @@
 
 
 
-
-
+.abp-contextmenuitem{display:none!important;}
+.tabbrowser-tab{min-width:150px!important;}
+#urlbar[pageproxystate='invalid'] > #identity-box{pointer-events: auto!important;} 
 
 /* identity box * /
 

@@ -37,19 +37,21 @@ FullZoom.onLocationChange = function FullZoom_onLocationChange(aURI, aIsTabSwitc
 		this.button.label = markupDocumentViewer.fullZoom
 		return;
     }
-    if (aURI.spec == "about:blank") {
+    /* if (aURI.spec == "about:blank") {
         this._applyPrefToSetting(undefined, aBrowser);
         return;
-    }
+    } */
     var browser = aBrowser || gBrowser.selectedBrowser;
     if (!aIsTabSwitch && browser.contentDocument.mozSyntheticDocument) {
         ZoomManager.setZoomForBrowser(browser, 1);
         return;
     }
     var markupDocumentViewer = browser.markupDocumentViewer;
-
+    
+    var is1 = /^((https?:\/\/(localhost|c9\.io))|about:config|chrome)/.test(aURI.spec)
+    dump(aURI.spec)
 	markupDocumentViewer.textZoom = this._tzoom;
-	markupDocumentViewer.fullZoom = this._fzoom;
+	markupDocumentViewer.fullZoom = is1 ? 1 : this._fzoom;
 	aBrowser.zoomIsModified = true
 }
 FullZoom._fzoom=1.2
@@ -246,8 +248,8 @@ XULBrowserWindow.onLinkIconAvailable = function (aIconURL) {
  *   remove annoying shortcuts and "features"
  */
 BrowserHandleBackspace = BrowserHandleShiftBackspace = dump
-
-/*	TabsInTitlebar.uninit()
+TabsInTitlebar && TabsInTitlebar.uninit()
+/*	
 	TabsInTitlebar=null
 	updateAppButtonDisplay = dump */
 //gFindBar._shouldFastFind=function(){}
@@ -325,6 +327,19 @@ window.addEventListener("load", function(){
 		event.stopPropagation();
 		event.preventDefault();
 	}, true)
+
+
+
+	/***************************************************************************
+	 *   remove annoying shortcuts and "features"
+	 */
+
+	if (window.MousePosTracker) {
+		window.removeEventListener("mousemove", MousePosTracker, false);
+		window.removeEventListener("dragover", MousePosTracker, false);
+	}
+	BrowserHandleBackspace = BrowserHandleShiftBackspace = dump
+	TabsInTitlebar && TabsInTitlebar.uninit()
 }, false);
 
 
@@ -488,3 +503,31 @@ window.addEventListener("click", function(e){
 }, true)
 
 
+
+gIdentityHandler.handleIdentityButtonEvent = function (event) {
+    this._popupOpenTime = new Date();
+    event.stopPropagation();
+
+    if ((event.type == "click" && event.button != 0) ||
+        (event.type == "keypress" && event.charCode != KeyEvent.DOM_VK_SPACE && event.keyCode != KeyEvent.DOM_VK_RETURN)||
+        gURLBar.getAttribute("pageproxystate") != "valid")
+        return gURLBar._textRevertedHandler(); // Left click, space or enter only
+
+    // Make sure that the display:none style we set in xul is removed now that
+    // the popup is actually needed
+    this._identityPopup.hidden = false;
+
+    // Update the popup strings
+    this.setPopupMessages(this._identityBox.className);
+
+    // Add the "open" attribute to the identity box for styling
+    this._identityBox.setAttribute("open", "true");
+    var self = this;
+    this._identityPopup.addEventListener("popuphidden", function onPopupHidden(e) {
+        e.currentTarget.removeEventListener("popuphidden", onPopupHidden, false);
+        self._identityBox.removeAttribute("open");
+    }, false);
+
+    // Now open the popup, anchored off the primary chrome element
+    this._identityPopup.openPopup(this._identityIcon, "bottomcenter topleft");
+}
