@@ -415,17 +415,17 @@ onCommand = function(el){
 	gHiddenItems[item.id] = !visible
 }
 //*************
-xmlFragment =
-	  <richlistitem align="center" id='$id$' disabled="$!visible$">
-		<hbox align="center" class='image'>
-			<image src="$image$" width="16" height="16"/>
-		</hbox>
-		<checkbox aID="visible" checked="$visible$" label="$label$" oncommand="onCommand(this)"/>
-	  </richlistitem>.toXMLString().replace(/>\s*</g,'><')
-sepFragment =
-	<hbox align="center" id='$id$' class='separator' disabled="$!visible$">
-	  <checkbox aID="visible" checked="$visible$" label="$label$" oncommand="onCommand(this)"/>
-	</hbox>.toXMLString().replace(/>\s*</g,'><')
+xmlFragment = "\
+	  <richlistitem align='center' id='$id$' disabled='$!visible$'>\
+		<hbox align='center' class='image'>\
+			<image src='$image$' width='16' height='16'/>\
+		</hbox>\
+		<checkbox aID='visible' checked='$visible$' label='$label$' oncommand='onCommand(this)'/>\
+	  </richlistitem>".replace(/\s*</g,'<')
+sepFragment = "\
+	<hbox align='center' id='$id$' class='separator' disabled='$!visible$'>\
+	  <checkbox aID='visible' checked='$visible$' label='$label$' oncommand='onCommand(this)'/>\
+	</hbox>".replace(/\s*</g,'<')
 
 function menu2XML(p){
 	return formatString(p.name == "menuseparator" ? sepFragment : xmlFragment, p)

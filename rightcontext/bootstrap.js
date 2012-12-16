@@ -7,7 +7,7 @@ XPIProviderBP.XPIProvider.bootstrapScopes["right@context.a.am"]
 
 pref = {
 	name: "extensions.rightContext.itemlist",
-	defVal: '#openlink,#openlinkincurrent,#openlinkintab,#searchselect',
+	defVal: '#openlink,#openlinkincurrent,#openlinkintab,#searchselect,#openlinkprivate',
 	
 	get: function(){
 		if (Services.prefs.prefHasUserValue(this.name))

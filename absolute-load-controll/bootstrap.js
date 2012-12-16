@@ -1,25 +1,24 @@
 var xml =
-	<panel id='load-control-panel' type="arrow" orient='vertical' onclick='CombinedStopReload.panelClick(event)' context='toolbar-context-menu'>
-		<hbox>
-			<groupbox>
-				<caption><button action="s-this"  label='stop'/></caption>
-				<toolbarbutton action="s-other"   style='-moz-box-pack:start'>other tabs</toolbarbutton>				
-				<toolbarbutton action="s-all"     style='-moz-box-pack:start'>all tabs</toolbarbutton>
-				<toolbarbutton action="f-this"    style='-moz-box-pack:start'>freeze tab</toolbarbutton>
-			</groupbox>
-			<groupbox>
-				<caption><button action="r-this"  label='reload'/></caption>
-				<toolbarbutton action="r-broken"  style='-moz-box-pack:end' image='chrome://global/skin/icons/warning-16.png'>broken tabs</toolbarbutton>
-				<toolbarbutton action="r-other"   style='-moz-box-pack:end'>other tabs</toolbarbutton>
-				<toolbarbutton action="r-stopped" style='-moz-box-pack:end'>stopped tabs</toolbarbutton>
-			</groupbox>
-		</hbox>
-		<hbox>
-			<toolbarbutton action="disableJS" label='allowJavascript' flex='1' type='checkbox'/>
-			<toolbarbutton action="r-memory"  label='reload from memory'  flex='1'/>
-		</hbox>
-	</panel>
-xml=xml.toXMLString()
+	"<panel id='load-control-panel' type='arrow' orient='vertical' onclick='CombinedStopReload.panelClick(event)' context='toolbar-context-menu'>\
+		<hbox>\
+			<groupbox>\
+				<caption><button action='s-this'  label='stop'/></caption>\
+				<toolbarbutton action='s-other'   style='-moz-box-pack:start'>other tabs</toolbarbutton>\
+				<toolbarbutton action='s-all'     style='-moz-box-pack:start'>all tabs</toolbarbutton>\
+				<toolbarbutton action='f-this'    style='-moz-box-pack:start'>freeze tab</toolbarbutton>\
+			</groupbox>\
+			<groupbox>\
+				<caption><button action='r-this'  label='reload'/></caption>\
+				<toolbarbutton action='r-broken'  style='-moz-box-pack:end' image='chrome://global/skin/icons/warning-16.png'>broken tabs</toolbarbutton>\
+				<toolbarbutton action='r-other'   style='-moz-box-pack:end'>other tabs</toolbarbutton>\
+				<toolbarbutton action='r-stopped' style='-moz-box-pack:end'>stopped tabs</toolbarbutton>\
+			</groupbox>\
+		</hbox>\
+		<hbox>\
+			<toolbarbutton action='disableJS' label='allowJavascript' flex='1' type='checkbox'/>\
+			<toolbarbutton action='r-memory'  label='reload from memory'  flex='1'/>\
+		</hbox>\
+	</panel>".replace(/>\s*</g,'><')
 
 appendXML = function(document){
 	var mainPopupSet = document.getElementById("mainPopupSet")
