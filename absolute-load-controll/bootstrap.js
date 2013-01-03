@@ -34,7 +34,7 @@ appendXML = function(document){
 
 var Cc = Components.classes;
 var Ci = Components.interfaces;
-//Components.utils.import("resource://gre/modules/Services.jsm");
+Components.utils.import("resource://gre/modules/Services.jsm");
 
 function modifyCombinedStopReload(window){with(window){
 	CombinedStopReload.switchToStop = function(){
@@ -255,6 +255,49 @@ function modifyCombinedStopReload(window){with(window){
 	}
 }}
 
+
+function modifyTabsProgressListener(window, val){
+    if (val == null) try {
+        val = window.gPrefService.getCharPref("extensions.absoluteLoadControl.block")
+    }catch(e){}
+    
+    var ts = window.TabsProgressListener
+    if (!ts.onRefreshAttempted_orig)
+        ts.onRefreshAttempted_orig = ts.onRefreshAttempted;
+        
+    ts.onRefreshAttempted = 
+        val == "reload"
+        ? function(aBrowser, aWebProgress, aURI, aDelay, aSameURI){return !aSameURI}
+        : val == "all"
+        ? function(aBrowser, aWebProgress, aURI, aDelay, aSameURI){return false}
+        : ts.onRefreshAttempted_orig
+    
+    window = ts = undefined;
+}
+var PrefObserver = {
+    register: function() {
+        this._branch = Services.prefs.getBranch("extensions.absoluteLoadControl.");
+        this._branch.QueryInterface(Components.interfaces.nsIPrefBranch2);
+        this._branch.addObserver("", this, false);
+    },
+
+    unregister: function() {
+        if (!this._branch)
+            return;
+        this._branch.removeObserver("", this);
+    },
+
+    observe: function(aSubject, aTopic, aData) {
+        if (aTopic != "nsPref:changed")
+            return;
+        let enumerator = Services.wm.getEnumerator("navigator:browser");
+        while(enumerator.hasMoreElements()) {
+            let win = enumerator.getNext();
+            modifyTabsProgressListener(win)
+        }
+    }
+};
+
 function loadIntoWindow(window) {
 	try{
 		var csr = window.CombinedStopReload
@@ -262,6 +305,7 @@ function loadIntoWindow(window) {
 			csr.uninit()
 		modifyCombinedStopReload(window)
 		csr.init()
+        modifyTabsProgressListener(window)
 	}catch(e){Components.utils.reportError(e)}
 }
 
@@ -270,6 +314,7 @@ function unloadFromWindow(mWindow){
 	try{
 		Cc["@mozilla.org/moz/jssubscript-loader;1"].createInstance(Ci.mozIJSSubScriptLoader)
 				.loadSubScript( __SCRIPT_URI_SPEC__+'/../cleanup.js', mWindow);
+        modifyTabsProgressListener(mWindow, "original")
 	}catch(e){Components.utils.reportError(e)}
 }
 
@@ -287,30 +332,29 @@ function windowWatcher(win, topic) {
  * bootstrap.js API
  *****************/
 function startup(aData, aReason) {
-	let wm = Cc["@mozilla.org/appshell/window-mediator;1"].getService(Ci.nsIWindowMediator);
-
-	// Load into any existing windows
-	let enumerator = wm.getEnumerator("navigator:browser");
+    // Load into any existing windows
+	let enumerator = Services.wm.getEnumerator("navigator:browser");
 	while(enumerator.hasMoreElements()) {
 		let win = enumerator.getNext();
 		loadIntoWindow(win);
 	}
 	// Load into all new windows
 	Services.ww.registerNotification(windowWatcher)
+    PrefObserver.register()
 }
 
 function shutdown(aData, aReason) {	
 	if (aReason == APP_SHUTDOWN)
 		return;
 		
-	let wm = Cc["@mozilla.org/appshell/window-mediator;1"].getService(Ci.nsIWindowMediator);	
 	// Unload from any existing windows
-	let enumerator = wm.getEnumerator("navigator:browser");
+	let enumerator = Services.wm.getEnumerator("navigator:browser");
 	while(enumerator.hasMoreElements()) {
 		let win = enumerator.getNext();
 		unloadFromWindow(win);
 	}
 	Services.ww.unregisterNotification(windowWatcher)
+    PrefObserver.unregister()
 }
 
 function install(aData, aReason){
