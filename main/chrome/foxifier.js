@@ -1,3 +1,5 @@
+noop = function() {}
+window.TabView && (TabView._setBrowserKeyHandlers = noop)
 var TabHistory ={// copies history from one tab to another, via tab.browser.sessionHistory
 	copyHistory : function(fromTab, newTab){
 		var fromHistory = gBrowser.getBrowserForTab(fromTab).sessionHistory;
@@ -15,14 +17,15 @@ var TabHistory ={// copies history from one tab to another, via tab.browser.sess
 		// when left-click opens new windows in tabs (TabMix doesn't need this)
 		// Note: this calls addTab, but with a blank tab, which is kind of a pain in the ass.
 		eval('nsBrowserAccess.prototype.openURI='+
-			nsBrowserAccess.prototype.openURI.toString().replace(/(var newTab.*;)/,
-				'$1\nTabHistory.copyHistory(gBrowser.selectedTab, newTab);'));
+			nsBrowserAccess.prototype.openURI.toString().replace(/(let browser = win.gBrowser.getBrowserForTab\(tab\);)/,
+				'$1\nTabHistory.copyHistory(gBrowser.selectedTab, tab);'));
 		// rewrite addTab to add history
 		// Note: the (0 == sessionHistory.count) is to not execute copyHistory if the
 		// previous eval statement was called, because it's already been executed.
-		var tabbrowser = document.getElementById("content");
-		eval('tabbrowser.addTab='+ tabbrowser.addTab.toString().replace(/(return t;)/,
+		var tabbrowser = document.getElementById("content");        
+        eval("tabbrowser.$addTab=" + tabbrowser.addTab.toString().replace(/(return t;)/,
 			"if((0==b.sessionHistory.count)&&(aRelatedToCurrent||aReferrerURI))TabHistory.copyHistory(this.selectedTab, t);\n $1"));
+        Object.defineProperty(tabbrowser,"addTab", {configurable:true,enumerable:true,value:tabbrowser.$addTab,writable:true})
 	}
 };
 
@@ -248,7 +251,7 @@ XULBrowserWindow.onLinkIconAvailable = function (aIconURL) {
  *   remove annoying shortcuts and "features"
  */
 BrowserHandleBackspace = BrowserHandleShiftBackspace = dump
-TabsInTitlebar && TabsInTitlebar.uninit()
+
 /*	
 	TabsInTitlebar=null
 	updateAppButtonDisplay = dump */
@@ -340,6 +343,8 @@ window.addEventListener("load", function(){
 	}
 	BrowserHandleBackspace = BrowserHandleShiftBackspace = dump
 	TabsInTitlebar && TabsInTitlebar.uninit()
+    
+    document.getElementById("toolbar-menubar").setAttribute("autohide", false)
 }, false);
 
 
@@ -451,23 +456,28 @@ var cookieSwap = {
 		var currentBr=gBrowser.mCurrentBrowser
 		for(var i in brs){
 			var br=brs[i],tab=tbs[i], loc = br._contentWindow.location.href
-			if(br!=currentBr && loc.search('mail.google.com')!=-1){
+			if(loc.search('mail.google.com')!=-1){
 				//tab=gBrowser.mCurrentTab
 				//Cc['@mozilla.org/browser/sessionstore;1'].getService(Ci.nsISessionStore).duplicateTab(window,tab , 0)
-				gBrowser.removeTab(tab, {animate: false, byMouse: false})
+				if (br!=currentBr)
+                    gBrowser.removeTab(tab, {animate: false, byMouse: false})
 			}
 		}
+        getWebNavigation().allowJavascript = false
 		this.switchToProfile(name)
 		// loc = currentBr._contentWindow.location.href
-		if(loadMail)
-			getWebNavigation().loadURI('https://mail.google.com/mail/',
-									nsIWebNavigation.LOAD_FLAGS_BYPASS_HISTORY |
-									nsIWebNavigation.LOAD_FLAGS_CHARSET_CHANGE |
-									nsIWebNavigation.LOAD_FLAGS_REPLACE_HISTORY,
-								  null, null, null);
-		else
-			currentBr.reloadWithFlags(nsIWebNavigation.LOAD_FLAGS_CHARSET_CHANGE)
+		//if(loadMail)
+		//else
+		//	currentBr.reloadWithFlags(nsIWebNavigation.LOAD_FLAGS_CHARSET_CHANGE)
+        getWebNavigation().loadURI('https://mail.google.com/mail/',
+                                nsIWebNavigation.LOAD_FLAGS_BYPASS_HISTORY |
+                                nsIWebNavigation.LOAD_FLAGS_CHARSET_CHANGE |
+                                nsIWebNavigation.LOAD_FLAGS_REPLACE_HISTORY,
+                              null, null, null);
 		gBrowser._lastRelatedTab = null
+        setTimeout(function() {
+            getWebNavigation().allowJavascript = true
+        })        
 	},
 	onPopupCommand: function(e){
 		var t = e.target

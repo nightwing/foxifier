@@ -1,4 +1,4 @@
 content        foxifier        chrome/
 overlay        chrome://browser/content/browser.xul           chrome://foxifier/content/overlay.xul
 style          chrome://browser/content/browser.xul           chrome://foxifier/content/overlay.css
-override	   chrome://browser/skin/browser.css			  chrome://foxifier/content/browser.css
+#override	   chrome://browser/skin/browser.css			  chrome://foxifier/content/browser.css

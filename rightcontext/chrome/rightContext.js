@@ -145,13 +145,13 @@ rightContext.isTextSelection = function() {
 
 	// format "Search <engine> for <selection>" string to show in menu
 	var menuLabel = gNavigatorBundle.getFormattedString(
-										"contextMenuSearchText", [engine.name, croppedText]);
+										"contextMenuSearch", [engine.name, croppedText]);
 	if(menuitem){
 		menuitem.label = menuLabel;
 		menuitem.image = engine.iconURI.spec
 		splitMenu.setAttribute('name', engine.name)
 		splitMenu.setAttribute('pluginType', "instantFox")
-		menuitem.accessKey = gNavigatorBundle.getString("contextMenuSearchText.accesskey");
+		menuitem.accessKey = gNavigatorBundle.getString("contextMenuSearch.accesskey");
 		splitMenu.hidden = false
 	}
 
@@ -307,7 +307,7 @@ rightContext.initOpenItems = function() {
 	
 	if (linkText) {
 		var uri;
-		if (/^(?:https?|ftp):/i.test(linkText)) {
+		if (/^(?:https?|ftp|irc|about):/i.test(linkText)) {
 			try {
 				uri = makeURI(linkText);
 			} catch (ex) {}
@@ -320,7 +320,7 @@ rightContext.initOpenItems = function() {
 			} catch (ex) {}		
 		}
 
-		if (uri && uri.host) {
+		if (uri && (uri.scheme == "about" || uri.host)) {
 			this.linkURI = uri;
 			this.linkURL = uri.spec;
 			onPlainTextLink = true;
@@ -359,7 +359,8 @@ rightContext.getPlainLinkText = function(){
 		return linkText
 	}
 	
-	findMatch(/(https?|irc):\/\/[^\s]+/ig) ||
+	findMatch(/(https?|irc|chrome|file):\/\/[^\s]+/ig) ||
+	findMatch(/about:[\w\-]+/ig) ||
 	findMatch(/www\.[^\s]+/ig) ||
 	findMatch(/[a-z\d-]+\.[a-z\d-]+[^\s]*/ig)
 
@@ -403,7 +404,16 @@ rightContext.modifyContextMenu = function(enable){
 	var proto = nsContextMenu.prototype
 	var ifox = "InstantFox" in window
 	
-	ifox || this.hook(proto, 'isTextSelection',  enable)
+    
+    if (!ifox) {
+        if (typeof proto["formatSearchContextItem"] == "function")
+            var fnName = "formatSearchContextItem";
+        else if (typeof proto["isTextSelection"] == "function")
+            var fnName = "isTextSelection";
+        this[fnName] = this.isTextSelection;
+        this.hook(proto, fnName,  enable)
+    }
+    
 	this.hook(proto, 'initOpenItems',  enable)
 	
 	if (enable){
@@ -415,8 +425,13 @@ rightContext.modifyContextMenu = function(enable){
 		this.remove("right-context-openlinkintab")	
 	}
 }
-rightContext.initStyles = function(){	
-	var pref = Cu.import("resource://gre/modules/XPIProvider.jsm").XPIProvider.bootstrapScopes["right@context.a.am"].pref.get()
+rightContext.initStyles = function(){
+    try {
+        var XPIProvider = Cu.import("resource://gre/modules/addons/XPIProvider.jsm").XPIProvider
+    } catch(e) {
+        var XPIProvider = Cu.import("resource://gre/modules/XPIProvider.jsm").XPIProvider
+    }
+	var pref = XPIProvider.bootstrapScopes["right@context.a.am"].pref.get()
 
 	var hideCss = "#" + pref.replace(',', ",#", "g") + '{display:none}'
 	this.styleSheet.textContent = // innerHTML
@@ -450,7 +465,11 @@ rightContext.init = function(enable) {
     	s.setAttribute("type", "text/css")
 		this.styleSheet = s		           
         document.documentElement.appendChild(s)
-		this.initStyles()
+        try {
+            this.initStyles()
+        } catch(e) {
+            Cu.reportError(e)
+        }
 	}else{
 		this.remove(this.styleSheet)
 		var s = document.querySelector('script[src^="chrome://rightContext/content/"]')

@@ -220,7 +220,14 @@ var Cc = Components.classes
 var Ci = Components.interfaces
 
 Components.utils.import("resource://gre/modules/Services.jsm");
-
+var forEachWindow = function(func){
+    let enumerator = Services.wm.getEnumerator("navigator:browser");
+    while(enumerator.hasMoreElements()) {
+        let win = enumerator.getNext();
+        try{func(win)}catch(e){Components.utils.reportError(e)}
+    }		
+}
+    
 var core = Components.utils.import("resource://gre/modules/XPIProvider.jsm").XPIProvider.bootstrapScopes["right@context.a.am"]
 
 //************* dom utils
@@ -406,7 +413,7 @@ function savePrefs(){
 		if(x!="undefined" && x!="no-id" && gHiddenItems[x])
 			list.push(x)
 	core.pref.save(list)
-	core.WindowListener.forEach(function(win){win.rightContext.initStyles()})
+	forEachWindow(function(win){win.rightContext.initStyles()})
 }
 onCommand = function(el){
 	var item = $parent(el)		
